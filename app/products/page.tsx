@@ -422,8 +422,8 @@ export default function ProductsPage() {
 
   return (
     <>
-      <main className="min-h-screen container mx-auto px-6 py-12 pb-40">
-        <div className="mx-auto w-full max-5xl space-y-12">
+      <main className="min-h-screen w-full px-4 sm:px-6 py-12 pb-40">
+        <div className="mx-auto w-full max-w-6xl space-y-12">
           <header className="flex flex-wrap items-start justify-between gap-6">
             <div className="space-y-4">
               <Link
@@ -446,8 +446,8 @@ export default function ProductsPage() {
 
           <section className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 backdrop-blur-md">
             <div className="space-y-6">
-               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Alta de Producto</span>
-               <form onSubmit={createProduct} className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Alta de Producto</span>
+              <form onSubmit={createProduct} className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <input
                   type="text"
                   value={newProduct.title}
@@ -498,7 +498,7 @@ export default function ProductsPage() {
             </div>
           ) : products.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center space-y-6">
-               <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-white/5 text-slate-600 ring-1 ring-white/10">
+              <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-white/5 text-slate-600 ring-1 ring-white/10">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25-2.25M12 13.875V7.5M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
                 </svg>
@@ -509,7 +509,7 @@ export default function ProductsPage() {
               </div>
             </div>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {products.map((product) => (
                 <button
                   type="button"
@@ -530,7 +530,7 @@ export default function ProductsPage() {
                       </svg>
                     </div>
                   </div>
-                  
+
                   {product.description && (
                     <p className="mt-4 line-clamp-2 text-xs font-medium text-slate-400 leading-relaxed">
                       {product.description}
@@ -551,9 +551,9 @@ export default function ProductsPage() {
         </div>
 
         {showEditor && selectedProduct && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 sm:p-6">
-            <div className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-[2.5rem] border border-white/10 bg-slate-900 shadow-2xl overflow-hidden">
-              <div className="p-8 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 sm:p-6 lg:p-12">
+            <div className="w-full max-w-5xl max-h-[90vh] flex flex-col rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 bg-slate-900 shadow-2xl overflow-hidden">
+              <div className="p-6 sm:p-8 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
                 <div className="space-y-1">
                   <h3 className="text-2xl font-bold text-white tracking-tight">Detalle del Producto</h3>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-[#fb923c]">ID: {selectedProduct.id.slice(0, 8)}</p>
@@ -568,7 +568,7 @@ export default function ProductsPage() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-8 space-y-10">
+              <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10">
                 <section className="space-y-6">
                   <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Atributos Básicos</span>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -652,7 +652,7 @@ export default function ProductsPage() {
                                 {new Date(entry.created_at).toLocaleDateString()} · {new Date(entry.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </p>
                             </div>
-                            
+
                             <div className="flex flex-1 items-center gap-3">
                               <input
                                 type="number"

@@ -21,11 +21,11 @@ export default function RootLayout({
   return (
     <html lang="es" className="h-full antialiased dark">
       <body
-        className={`${geistSans.className} min-h-screen bg-slate-950 text-slate-200 selection:bg-[#fb923c]/30 selection:text-white relative overflow-x-hidden`}
+        className={`${geistSans.className} min-h-screen w-full bg-slate-950 text-slate-200 selection:bg-[#fb923c]/30 selection:text-white relative overflow-x-hidden`}
       >
         <MeshBackground />
         <UserProvider>
-          <div className="relative z-10">
+          <div className="relative z-10 w-full overflow-x-hidden">
             {children}
           </div>
         </UserProvider>

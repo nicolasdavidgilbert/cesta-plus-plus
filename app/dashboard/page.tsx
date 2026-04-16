@@ -322,8 +322,8 @@ export default function DashboardPage() {
 
   return (
     <>
-      <main className="min-h-screen container mx-auto px-6 py-12 pb-40">
-        <div className="max-w-4xl mx-auto space-y-10">
+      <main className="min-h-screen w-full px-4 sm:px-6 py-12 pb-40">
+        <div className="mx-auto w-full max-w-4xl space-y-10">
           <header className="space-y-6">
             <div className="space-y-2">
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Tu Centro de Control</span>

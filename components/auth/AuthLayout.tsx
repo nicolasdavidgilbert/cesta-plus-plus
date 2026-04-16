@@ -16,7 +16,7 @@ export function AuthLayout({ children, title, subtitle, marketing }: AuthLayoutP
     <main className="relative min-h-screen selection:bg-brand-orange/30">
       <MeshBackground />
       
-      <div className="container mx-auto flex min-h-screen flex-col items-center justify-center px-4 py-12">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col items-center justify-center px-4 py-12">
         {/* Logo/Branding */}
         <Link href="/" className="group mb-12 flex items-center gap-3 transition-transform hover:scale-105 active:scale-95">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-2xl font-bold text-white shadow-lg shadow-[#fb923c]/20 ring-1 ring-white/20">

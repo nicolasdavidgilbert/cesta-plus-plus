@@ -627,7 +627,7 @@ export default function ListDetailPage() {
   }
 
   return (
-    <main className="min-h-screen container mx-auto px-6 py-12 pb-40">
+    <main className="min-h-screen w-full px-4 sm:px-6 py-12 pb-40">
       <div className="mx-auto w-full max-w-4xl space-y-10">
         <header className="space-y-8">
           <div className="flex flex-wrap items-start justify-between gap-6">

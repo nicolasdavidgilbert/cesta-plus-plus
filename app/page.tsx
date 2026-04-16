@@ -54,7 +54,7 @@ export default function HomePage() {
       
       {/* Header / Nav */}
       <header className="fixed top-0 z-50 w-full border-b border-white/5 bg-slate-950/50 backdrop-blur-xl">
-        <div className="container mx-auto flex h-20 items-center justify-between px-6">
+        <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-xl font-bold text-white shadow-lg shadow-[#fb923c]/20 ring-1 ring-white/20">
               C+
@@ -81,7 +81,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 pt-32 pb-24">
+      <main className="mx-auto w-full max-w-7xl px-4 sm:px-6 pt-32 pb-24">
         {/* Hero Section */}
         <section className="grid items-center gap-16 lg:grid-cols-2 lg:py-20">
           <div className="space-y-8">
