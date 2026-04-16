@@ -664,7 +664,7 @@ export default function ListDetailPage() {
             </div>
           </div>
 
-          <div className="inline-flex items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-md">
+          <div className="flex w-full items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-md overflow-x-auto sm:overflow-x-visible">
             {[
               { id: 'products', label: 'Productos', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25-2.25M12 13.875V7.5M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg> },
               { id: 'settings', label: 'Gestión', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg> },
@@ -673,14 +673,15 @@ export default function ListDetailPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition-all ${
+                className={`flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all ${
                   activeTab === tab.id
                     ? 'bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-lg shadow-[#fb923c]/20'
                     : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
                 }`}
               >
                 {tab.icon}
-                {tab.label}
+                <span className="hidden min-[400px]:inline">{tab.label}</span>
+                <span className="min-[400px]:hidden">{tab.id === 'products' ? 'Prods' : tab.id === 'settings' ? 'Gest' : 'Est'}</span>
               </button>
             ))}
           </div>
