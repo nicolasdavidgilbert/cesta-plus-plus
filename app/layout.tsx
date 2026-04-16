@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { UserProvider } from "@/contexts/UserContext";
+import { MeshBackground } from "@/components/auth/MeshBackground";
 
 const geistSans = Geist({
   subsets: ["latin"],
@@ -18,11 +19,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="h-full antialiased">
+    <html lang="es" className="h-full antialiased dark">
       <body
-        className={`${geistSans.className} min-h-full bg-gradient-to-br from-amber-50 via-orange-50 to-sky-100 text-slate-900 selection:bg-orange-200 selection:text-slate-900`}
+        className={`${geistSans.className} min-h-screen bg-slate-950 text-slate-200 selection:bg-[#fb923c]/30 selection:text-white relative overflow-x-hidden`}
       >
-        <UserProvider>{children}</UserProvider>
+        <MeshBackground />
+        <UserProvider>
+          <div className="relative z-10">
+            {children}
+          </div>
+        </UserProvider>
       </body>
     </html>
   );

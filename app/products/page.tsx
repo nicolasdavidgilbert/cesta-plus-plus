@@ -96,7 +96,7 @@ function reconcileProducts(previous: Product[], incoming: Product[]) {
 }
 
 const inputClassName =
-  'w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100'
+  'w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5'
 
 export default function ProductsPage() {
   const router = useRouter()
@@ -411,15 +411,10 @@ export default function ProductsPage() {
 
   if (authLoading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6">
-        <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-xl">
-          <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
-            <div className="h-9 w-9 animate-spin rounded-full border-4 border-slate-200 border-t-orange-500" />
-            <div>
-              <p className="text-sm font-medium text-slate-900">Cargando productos</p>
-              <p className="text-xs text-slate-500">Esto tarda solo unos segundos.</p>
-            </div>
-          </div>
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-[#fb923c]" />
+          <p className="text-sm font-bold uppercase tracking-widest text-[#fb923c]">Sincronizando productos</p>
         </div>
       </main>
     )
@@ -427,256 +422,281 @@ export default function ProductsPage() {
 
   return (
     <>
-      <main className="min-h-screen px-4 py-6 pb-36 sm:px-6">
-        <div className="mx-auto w-full max-w-3xl space-y-4">
-          <header className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-xl sm:p-6">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-orange-500">Catalogo</p>
-                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-                  Productos
-                </h1>
-                <p className="mt-2 text-sm text-slate-500">
-                  Toca un producto para editar nombre, descripcion e historial de precios.
-                </p>
-              </div>
+      <main className="min-h-screen container mx-auto px-6 py-12 pb-40">
+        <div className="mx-auto w-full max-5xl space-y-12">
+          <header className="flex flex-wrap items-start justify-between gap-6">
+            <div className="space-y-4">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-all hover:bg-white/10 hover:text-white"
               >
-                Volver a listas
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 transition-transform group-hover:-translate-x-1">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Volver a Listas
               </Link>
+              <div className="space-y-1">
+                <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+                  Catálogo Maestro
+                </h1>
+                <p className="text-sm text-slate-500 font-medium tracking-tight">Gestiona productos, descripciones y haz seguimiento histórico de precios.</p>
+              </div>
             </div>
           </header>
 
-        <section className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-xl sm:p-6">
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Nuevo producto</h2>
-          <form onSubmit={createProduct} className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-            <input
-              type="text"
-              value={newProduct.title}
-              onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
-              placeholder="Nombre *"
-              className={inputClassName}
-              required
-            />
-            <input
-              type="text"
-              value={newProduct.description}
-              onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-              placeholder="Descripcion"
-              className={inputClassName}
-            />
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              value={newProduct.price}
-              onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-              placeholder="Precio (EUR)"
-              className={inputClassName}
-            />
-            <button
-              type="submit"
-              disabled={creating || !newProduct.title.trim()}
-              className="inline-flex items-center justify-center rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {creating ? 'Creando...' : 'Anadir producto'}
-            </button>
-          </form>
-        </section>
+          <section className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 backdrop-blur-md">
+            <div className="space-y-6">
+               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Alta de Producto</span>
+               <form onSubmit={createProduct} className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <input
+                  type="text"
+                  value={newProduct.title}
+                  onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
+                  placeholder="Nombre del producto *"
+                  className={inputClassName}
+                  required
+                />
+                <input
+                  type="text"
+                  value={newProduct.description}
+                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                  placeholder="Descripción"
+                  className={inputClassName}
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={newProduct.price}
+                  onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                  placeholder="Precio inicial (EUR)"
+                  className={inputClassName}
+                />
+                <button
+                  type="submit"
+                  disabled={creating || !newProduct.title.trim()}
+                  className="group relative flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-6 py-4 text-sm font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                >
+                  <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+                  {creating ? 'Creando...' : 'Añadir Producto'}
+                </button>
+              </form>
+            </div>
+          </section>
 
-        {error && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-            {error}
-          </div>
-        )}
+          {error && (
+            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-6 py-4 text-sm font-medium text-rose-400 backdrop-blur-md">
+              {error}
+            </div>
+          )}
 
-        {loading && products.length === 0 ? (
-          <section className="grid gap-2.5 sm:grid-cols-2">
-            {[0, 1, 2, 3, 4, 5].map((skeleton) => (
-              <div
-                key={skeleton}
-                className="h-28 animate-pulse rounded-xl border border-slate-200 bg-white/70"
-              />
-            ))}
-          </section>
-        ) : products.length === 0 ? (
-          <section className="rounded-3xl border border-dashed border-slate-300 bg-white/70 px-6 py-10 text-center">
-            <h2 className="text-xl font-semibold text-slate-900">No hay productos aun</h2>
-            <p className="mt-2 text-sm text-slate-500">Anade el primero para empezar el historial de precios.</p>
-          </section>
-        ) : (
-          <section className="grid gap-2.5 sm:grid-cols-2">
-            {products.map((product) => (
-              <button
-                type="button"
-                key={product.id}
-                onClick={() => void openProductEditor(product)}
-                className="rounded-xl border border-slate-200 bg-white p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-lg"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-sm font-semibold text-slate-900">{product.title}</h3>
-                  <span className="rounded-lg bg-orange-100 px-2 py-1 text-[11px] font-semibold text-orange-700">
-                    Editar
-                  </span>
-                </div>
-                {product.description && (
-                  <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-slate-500">{product.description}</p>
-                )}
-                <div className="mt-3 flex items-center justify-between">
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Precio actual</p>
-                  <p className="text-sm font-semibold text-emerald-600">
-                    {product.current_price !== null ? `${product.current_price.toFixed(2)} EUR` : '-'}
-                  </p>
-                </div>
-                <p className="mt-2.5 text-[11px] font-medium uppercase tracking-wide text-slate-400">
-                  Pulsa para abrir el editor completo
-                </p>
-              </button>
-            ))}
-          </section>
-        )}
+          {loading && products.length === 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="h-40 animate-pulse rounded-3xl border border-white/5 bg-white/5" />
+              ))}
+            </div>
+          ) : products.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center space-y-6">
+               <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-white/5 text-slate-600 ring-1 ring-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25-2.25M12 13.875V7.5M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                </svg>
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-white tracking-tight">Catálogo sin ítems</h2>
+                <p className="text-slate-500 text-sm max-w-xs mx-auto">Tus productos creados aparecerán aquí para ser reutilizados en cualquier lista.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {products.map((product) => (
+                <button
+                  type="button"
+                  key={product.id}
+                  onClick={() => void openProductEditor(product)}
+                  className="group relative flex flex-col items-start rounded-[2rem] border border-white/5 bg-white/5 p-6 text-left backdrop-blur-sm transition-all hover:bg-white/10 hover:border-[#fb923c]/30 hover:-translate-y-1"
+                >
+                  <div className="w-full flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-bold text-white leading-tight tracking-tight group-hover:text-[#fb923c] transition-colors">{product.title}</h3>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                        Actualizado: {new Date(product.updated_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-white/5 text-[#fb923c] ring-1 ring-white/10 transition-all group-hover:bg-[#fb923c] group-hover:text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                      </svg>
+                    </div>
+                  </div>
+                  
+                  {product.description && (
+                    <p className="mt-4 line-clamp-2 text-xs font-medium text-slate-400 leading-relaxed">
+                      {product.description}
+                    </p>
+                  )}
+
+                  <div className="mt-8 pt-6 border-t border-white/5 w-full flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Último Precio</span>
+                    <span className="text-xl font-black text-white">
+                      {product.current_price !== null ? `${product.current_price.toFixed(2)}` : '-'}
+                      <span className="text-[10px] ml-1 text-[#fb923c]">EUR</span>
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {showEditor && selectedProduct && (
-          <div className="fixed inset-0 z-50 flex items-end bg-slate-900/50 p-3 sm:items-center sm:justify-center sm:p-6">
-            <div className="w-full max-w-3xl rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-6">
-              <div className="mb-4 flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="text-xl font-semibold text-slate-900">Editar producto</h3>
-                  <p className="mt-1 text-sm text-slate-500">
-                    Cambia datos basicos y administra el historial de precios.
-                  </p>
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 sm:p-6">
+            <div className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-[2.5rem] border border-white/10 bg-slate-900 shadow-2xl overflow-hidden">
+              <div className="p-8 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">Detalle del Producto</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#fb923c]">ID: {selectedProduct.id.slice(0, 8)}</p>
                 </div>
                 <button
                   onClick={closeEditor}
-                  className="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-500 transition hover:bg-slate-50"
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-slate-400 hover:text-white transition-colors"
                 >
-                  Cerrar
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
-              <section className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <h4 className="mb-3 text-sm font-semibold text-slate-700">Datos del producto</h4>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <input
-                    type="text"
-                    value={editorForm.title}
-                    onChange={(e) => setEditorForm({ ...editorForm, title: e.target.value })}
-                    placeholder="Nombre"
-                    className={inputClassName}
-                  />
-                  <input
-                    type="text"
-                    value={editorForm.description}
-                    onChange={(e) => setEditorForm({ ...editorForm, description: e.target.value })}
-                    placeholder="Descripcion"
-                    className={inputClassName}
-                  />
-                </div>
-                <button
-                  onClick={() => void saveProductChanges()}
-                  disabled={savingProduct || !editorForm.title.trim()}
-                  className="mt-3 inline-flex items-center justify-center rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {savingProduct ? 'Guardando...' : 'Guardar nombre y descripcion'}
-                </button>
-              </section>
-
-              <section className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h4 className="text-sm font-semibold text-slate-700">Historial de precios</h4>
-                  <p className="text-sm font-semibold text-emerald-600">
-                    Actual:{' '}
-                    {selectedProduct.current_price !== null
-                      ? `${selectedProduct.current_price.toFixed(2)} EUR`
-                      : '-'}
-                  </p>
-                </div>
-
-                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={newHistoryPrice}
-                    onChange={(e) => setNewHistoryPrice(e.target.value)}
-                    placeholder="Nuevo precio"
-                    className={inputClassName}
-                  />
+              <div className="flex-1 overflow-y-auto p-8 space-y-10">
+                <section className="space-y-6">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Atributos Básicos</span>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-500 ml-1">Nombre</label>
+                      <input
+                        type="text"
+                        value={editorForm.title}
+                        onChange={(e) => setEditorForm({ ...editorForm, title: e.target.value })}
+                        placeholder="Nombre"
+                        className={inputClassName}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-500 ml-1">Descripción</label>
+                      <input
+                        type="text"
+                        value={editorForm.description}
+                        onChange={(e) => setEditorForm({ ...editorForm, description: e.target.value })}
+                        placeholder="Notas adicionales..."
+                        className={inputClassName}
+                      />
+                    </div>
+                  </div>
                   <button
-                    onClick={() => void addNewHistoryPrice()}
-                    disabled={!newHistoryPrice || addingHistory}
-                    className="inline-flex shrink-0 items-center justify-center rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={() => void saveProductChanges()}
+                    disabled={savingProduct || !editorForm.title.trim()}
+                    className="flex items-center justify-center rounded-2xl bg-white px-8 py-3 text-sm font-bold text-slate-900 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                   >
-                    {addingHistory ? 'Anadiendo...' : 'Anadir al historial'}
+                    {savingProduct ? 'Guardando...' : 'Actualizar Información'}
                   </button>
-                </div>
+                </section>
 
-                <div className="mt-4 max-h-64 space-y-2 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50 p-2">
-                  {priceHistory.length === 0 ? (
-                    <p className="p-2 text-sm text-slate-500">Sin historial disponible.</p>
-                  ) : (
-                    priceHistory.map((historyEntry) => (
-                      <div
-                        key={historyEntry.id}
-                        className="rounded-xl border border-slate-200 bg-white p-3"
-                      >
-                        <div className="mb-2 flex items-center justify-between gap-3">
-                          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
-                            {new Date(historyEntry.created_at).toLocaleDateString('es-ES', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </p>
-                          <span className="text-xs font-semibold text-slate-500">
-                            ID: {historyEntry.id.slice(0, 8)}
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-2 sm:flex-row">
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={editingHistory[historyEntry.id] ?? ''}
-                            onChange={(e) =>
-                              setEditingHistory({
-                                ...editingHistory,
-                                [historyEntry.id]: e.target.value,
-                              })
-                            }
-                            className={inputClassName}
-                          />
-                          <button
-                            onClick={() => void saveHistoryEntry(historyEntry.id)}
-                            disabled={savingHistoryId === historyEntry.id}
-                            className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+                <section className="space-y-6 pt-10 border-t border-white/5">
+                  <div className="flex items-end justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Historial de Precios</span>
+                    <div className="text-right">
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Valor de Mercado Actual</p>
+                      <p className="text-3xl font-black text-emerald-400">
+                        {selectedProduct.current_price !== null ? `${selectedProduct.current_price.toFixed(2)}` : '-'}
+                        <span className="text-xs ml-1">EUR</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-4 sm:flex-row bg-white/5 p-6 rounded-3xl ring-1 ring-white/10">
+                    <div className="flex-1 space-y-2">
+                      <label className="text-xs font-bold text-slate-500 ml-1">Nuevo Punto de Precio</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={newHistoryPrice}
+                        onChange={(e) => setNewHistoryPrice(e.target.value)}
+                        placeholder="0.00"
+                        className={inputClassName}
+                      />
+                    </div>
+                    <button
+                      onClick={() => void addNewHistoryPrice()}
+                      disabled={!newHistoryPrice || addingHistory}
+                      className="group relative flex items-center justify-center overflow-hidden rounded-2xl bg-[#fb923c] px-8 py-4 text-sm font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 self-end"
+                    >
+                      {addingHistory ? 'Registrando...' : 'Registrar Precio'}
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {priceHistory.length === 0 ? (
+                      <p className="py-12 text-center text-xs text-slate-600 font-medium italic bg-white/5 rounded-[2rem]">Sin registros históricos aún.</p>
+                    ) : (
+                      <div className="grid gap-3">
+                        {priceHistory.map((entry) => (
+                          <div
+                            key={entry.id}
+                            className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between rounded-2xl bg-white/5 p-4 ring-1 ring-white/5 hover:bg-white/[0.08] transition-all"
                           >
-                            {savingHistoryId === historyEntry.id ? 'Guardando...' : 'Guardar'}
-                          </button>
-                          <button
-                            onClick={() => void deleteHistoryEntry(historyEntry.id)}
-                            disabled={deletingHistoryId === historyEntry.id}
-                            className="inline-flex items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            {deletingHistoryId === historyEntry.id ? 'Eliminando...' : 'Eliminar'}
-                          </button>
-                        </div>
+                            <div className="space-y-1 min-w-[140px]">
+                              <p className="text-[10px] font-bold text-slate-500 uppercase">Fecha de Registro</p>
+                              <p className="text-xs font-bold text-white">
+                                {new Date(entry.created_at).toLocaleDateString()} · {new Date(entry.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+                            
+                            <div className="flex flex-1 items-center gap-3">
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={editingHistory[entry.id] ?? ''}
+                                onChange={(e) => setEditingHistory({ ...editingHistory, [entry.id]: e.target.value })}
+                                className="h-10 grow rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-[#fb923c]/40"
+                              />
+                              <div className="flex gap-1.5">
+                                <button
+                                  onClick={() => void saveHistoryEntry(entry.id)}
+                                  disabled={savingHistoryId === entry.id}
+                                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-emerald-400 hover:bg-emerald-400/20 transition-all"
+                                  title="Guardar cambios"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                  </svg>
+                                </button>
+                                <button
+                                  onClick={() => void deleteHistoryEntry(entry.id)}
+                                  disabled={deletingHistoryId === entry.id}
+                                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-rose-500 hover:bg-rose-500/20 transition-all"
+                                  title="Eliminar entrada"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))
-                  )}
-                </div>
-              </section>
+                    )}
+                  </div>
+                </section>
+              </div>
             </div>
           </div>
         )}
-      </main>
 
-      <MobileDashboardNav />
+        <MobileDashboardNav />
+      </main>
     </>
   )
 }

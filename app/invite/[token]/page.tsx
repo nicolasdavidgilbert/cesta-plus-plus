@@ -50,7 +50,7 @@ export default function InvitePage() {
 
       const accepted = (Array.isArray(data) ? data[0] : data) as AcceptedInvite | undefined
       if (!accepted) {
-        setError('No se pudo validar el enlace.')
+        setError('No se pudo validar el enlace de invitación.')
         setLoading(false)
         return
       }
@@ -90,40 +90,56 @@ export default function InvitePage() {
   }, [authLoading, router, token, user])
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6">
-      <section className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-xl sm:p-8">
+    <main className="flex min-h-screen items-center justify-center p-6">
+      <section className="w-full max-w-xl rounded-[2.5rem] border border-white/10 bg-white/5 p-10 backdrop-blur-xl shadow-2xl text-center space-y-8">
         {loading ? (
-          <>
-            <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
-              <div className="h-9 w-9 animate-spin rounded-full border-4 border-slate-200 border-t-orange-500" />
-              <div>
-                <p className="text-sm font-medium text-slate-900">Uniéndote a la lista</p>
-                <p className="text-xs text-slate-500">Estamos validando tu invitación.</p>
+          <div className="space-y-6">
+            <div className="flex flex-col items-center gap-6">
+              <div className="relative">
+                <div className="h-20 w-20 animate-spin rounded-full border-4 border-white/5 border-t-[#fb923c]" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-[#fb923c]">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                  </svg>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-white tracking-tight">Validando Invitación</h1>
+                <p className="text-sm text-slate-500 font-medium">Conectando con el servidor seguro...</p>
               </div>
             </div>
             {joinedList && (
-              <p className="mt-4 text-sm text-slate-600">
-                Acceso concedido a <span className="font-semibold text-slate-900">{joinedList.list_name}</span>.
+              <p className="inline-flex rounded-full bg-emerald-500/10 px-4 py-1 text-xs font-bold text-emerald-400 ring-1 ring-emerald-500/20">
+                Acceso validado para: {joinedList.list_name}
               </p>
             )}
-          </>
+          </div>
         ) : error ? (
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-              {error}
+          <div className="space-y-8">
+            <div className="flex flex-col items-center gap-4">
+              <div className="h-16 w-16 flex items-center justify-center rounded-[1.5rem] bg-rose-500/10 text-rose-500 ring-1 ring-rose-500/20">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-white tracking-tight">Error de Validación</h1>
+                <p className="text-sm text-rose-400 font-medium max-w-sm mx-auto">{error}</p>
+              </div>
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
+            
+            <div className="flex flex-col gap-3 min-[400px]:flex-row justify-center">
               <button
                 onClick={() => router.refresh()}
-                className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="group relative flex items-center justify-center overflow-hidden rounded-2xl bg-white px-8 py-4 text-sm font-bold text-slate-900 transition-all hover:scale-[1.02] active:scale-95"
               >
                 Reintentar
               </button>
               <Link
                 href="/dashboard"
-                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                className="group inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-sm font-bold text-slate-400 transition-all hover:bg-white/10 hover:text-white"
               >
-                Ir al dashboard
+                Volver al Panel
               </Link>
             </div>
           </div>

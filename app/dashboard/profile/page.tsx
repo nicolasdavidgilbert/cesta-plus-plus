@@ -28,15 +28,10 @@ export default function ProfilePage() {
 
   if (loading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6">
-        <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-xl">
-          <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
-            <div className="h-9 w-9 animate-spin rounded-full border-4 border-slate-200 border-t-orange-500" />
-            <div>
-              <p className="text-sm font-medium text-slate-900">Cargando perfil</p>
-              <p className="text-xs text-slate-500">Preparando tus datos.</p>
-            </div>
-          </div>
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-[#fb923c]" />
+          <p className="text-sm font-bold uppercase tracking-widest text-[#fb923c]">Sincronizando perfil</p>
         </div>
       </main>
     )
@@ -44,62 +39,77 @@ export default function ProfilePage() {
 
   return (
     <>
-      <main className="min-h-screen px-4 py-6 pb-28 sm:px-6">
-        <div className="mx-auto w-full max-w-3xl space-y-4">
-          <section className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-orange-500">Perfil</p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-              Datos de usuario
-            </h1>
-            <ProfileForm
-              key={`${user.id}:${user.updatedAt || 'static'}`}
-              initialProfile={{
-                name: typeof user.profile?.name === 'string' ? user.profile.name : '',
-                avatar_url: typeof user.profile?.avatar_url === 'string' ? user.profile.avatar_url : '',
-                bio: typeof user.profile?.bio === 'string' ? user.profile.bio : '',
-              }}
-              currentProfile={user.profile || {}}
-              onSave={updateProfile}
-            />
-          </section>
+      <main className="min-h-screen container mx-auto px-6 py-12 pb-40">
+        <div className="mx-auto w-full max-w-4xl space-y-10">
+          <header className="space-y-4">
+             <Link
+                href="/dashboard"
+                className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-all hover:bg-white/10 hover:text-white"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 transition-transform group-hover:-translate-x-1">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Regresar
+              </Link>
+            <div className="space-y-1">
+              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+                Tu Identidad
+              </h1>
+              <p className="text-sm text-slate-500 font-medium tracking-tight">Personaliza tu presencia y gestiona tu cuenta.</p>
+            </div>
+          </header>
 
-          <section className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-              Información de cuenta
-            </p>
-            <dl className="mt-4 space-y-3 text-sm">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <dt className="text-xs uppercase tracking-wide text-slate-500">Email</dt>
-                <dd className="mt-1 break-all font-medium text-slate-900">{user.email}</dd>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <dt className="text-xs uppercase tracking-wide text-slate-500">ID</dt>
-                <dd className="mt-1 break-all font-medium text-slate-900">{user.id}</dd>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <dt className="text-xs uppercase tracking-wide text-slate-500">Email verificado</dt>
-                <dd className="mt-1 font-medium text-slate-900">
-                  {user.emailVerified ? 'Sí' : 'No'}
-                </dd>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <dt className="text-xs uppercase tracking-wide text-slate-500">Proveedores</dt>
-                <dd className="mt-1 font-medium text-slate-900">
-                  {user.providers?.length ? user.providers.join(', ') : 'N/A'}
-                </dd>
-              </div>
-            </dl>
-            <button
-              onClick={handleSignOut}
-              className="mt-4 inline-flex w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto"
-            >
-              Cerrar sesión
-            </button>
-          </section>
+          <div className="grid gap-8 lg:grid-cols-5">
+            <div className="lg:col-span-3 space-y-8">
+              <section className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 backdrop-blur-md">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Configuración Pública</span>
+                <ProfileForm
+                  key={`${user.id}:${user.updatedAt || 'static'}`}
+                  initialProfile={{
+                    name: typeof user.profile?.name === 'string' ? user.profile.name : '',
+                    avatar_url: typeof user.profile?.avatar_url === 'string' ? user.profile.avatar_url : '',
+                    bio: typeof user.profile?.bio === 'string' ? user.profile.bio : '',
+                  }}
+                  currentProfile={user.profile || {}}
+                  onSave={updateProfile}
+                />
+              </section>
+            </div>
+
+            <div className="lg:col-span-2 space-y-8">
+              <section className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 backdrop-blur-md space-y-8">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Detalles de Cuenta</span>
+                <div className="space-y-4">
+                  {[
+                    { label: 'Correo Electrónico', value: user.email },
+                    { label: 'Identificador Único', value: user.id },
+                    { label: 'Estado de Verificación', value: user.emailVerified ? 'Verificado' : 'Pendiente' },
+                    { label: 'Método de Acceso', value: user.providers?.join(', ') || 'N/A' },
+                  ].map((item, idx) => (
+                    <div key={idx} className="space-y-1 group">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">{item.label}</p>
+                      <div className="rounded-2xl border border-white/5 bg-white/5 px-5 py-3 text-sm font-medium text-slate-300 ring-1 ring-white/5 transition-all group-hover:bg-white/10 group-hover:text-white truncate">
+                        {item.value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-6 border-t border-white/5">
+                  <button
+                    onClick={handleSignOut}
+                    className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-rose-500/20 bg-rose-500/5 py-4 text-sm font-bold text-rose-500 transition-all hover:bg-rose-500 hover:text-white active:scale-95"
+                  >
+                    Cerrar Sesión Activa
+                  </button>
+                </div>
+              </section>
+            </div>
+          </div>
         </div>
-      </main>
 
-      <MobileDashboardNav />
+        <MobileDashboardNav />
+      </main>
     </>
   )
 }
@@ -117,6 +127,8 @@ function ProfileForm({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  const inputClassName = "w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5"
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -142,62 +154,86 @@ function ProfileForm({
     if (result.error) {
       setError(result.error)
     } else {
-      setSuccess('Perfil guardado.')
+      setSuccess('Tus cambios se han sincronizado correctamente.')
     }
     setSaving(false)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-5 space-y-3">
-      <label className="block space-y-2">
-        <span className="text-sm font-medium text-slate-700">Nombre</span>
-        <input
-          type="text"
-          value={profile.name}
-          onChange={(e) => setProfile((prev) => ({ ...prev, name: e.target.value }))}
-          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
-        />
-      </label>
-
-      <label className="block space-y-2">
-        <span className="text-sm font-medium text-slate-700">Avatar URL</span>
-        <input
-          type="url"
-          value={profile.avatar_url}
-          onChange={(e) => setProfile((prev) => ({ ...prev, avatar_url: e.target.value }))}
-          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
-          placeholder="https://..."
-        />
-      </label>
-
-      <label className="block space-y-2">
-        <span className="text-sm font-medium text-slate-700">Bio</span>
-        <textarea
-          value={profile.bio}
-          onChange={(e) => setProfile((prev) => ({ ...prev, bio: e.target.value }))}
-          className="h-24 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
-          placeholder="Sobre ti..."
-        />
-      </label>
-
-      {error && (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-          {error}
+    <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+      <div className="grid gap-6">
+        <div className="space-y-4">
+          <div className="flex flex-col gap-6 sm:flex-row">
+            <div className="relative group">
+              <div className="h-28 w-28 rounded-3xl overflow-hidden ring-4 ring-white/5 bg-slate-800 flex items-center justify-center transition-all group-hover:ring-[#fb923c]/20">
+                {profile.avatar_url ? (
+                  <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12 text-slate-600">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  </svg>
+                )}
+              </div>
+            </div>
+            <div className="flex-1 space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 ml-1">Nombre Completo</label>
+                <input
+                  type="text"
+                  value={profile.name}
+                  onChange={(e) => setProfile((prev) => ({ ...prev, name: e.target.value }))}
+                  className={inputClassName}
+                  placeholder="Cómo te llamas..."
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-500 ml-1">URL de Avatar</label>
+                <input
+                  type="url"
+                  value={profile.avatar_url}
+                  onChange={(e) => setProfile((prev) => ({ ...prev, avatar_url: e.target.value }))}
+                  className={inputClassName}
+                  placeholder="https://tu-imagen.jpg"
+                />
+              </div>
+            </div>
+          </div>
         </div>
-      )}
-      {success && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-          {success}
-        </div>
-      )}
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="inline-flex w-full items-center justify-center rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-      >
-        {saving ? 'Guardando...' : 'Guardar perfil'}
-      </button>
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-slate-500 ml-1">Biografía Breve</label>
+          <textarea
+            value={profile.bio}
+            onChange={(e) => setProfile((prev) => ({ ...prev, bio: e.target.value }))}
+            className={`${inputClassName} h-32 resize-none`}
+            placeholder="Cuenta algo sobre ti..."
+          />
+        </div>
+      </div>
+
+      <div className="pt-4 space-y-4">
+        {error && (
+          <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-6 py-4 text-sm font-medium text-rose-400">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-6 py-4 text-sm font-medium text-emerald-400">
+            {success}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-8 py-4 text-base font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 sm:w-auto"
+        >
+          <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+          {saving ? 'Guardando...' : 'Salvar Cambios'}
+        </button>
+      </div>
     </form>
   )
 }
+
+import Link from 'next/link'

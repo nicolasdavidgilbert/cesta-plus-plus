@@ -94,28 +94,36 @@ const DashboardListCard = memo(function DashboardListCard({ list }: { list: Dash
   return (
     <Link
       href={`/dashboard/${list.id}`}
-      className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"
+      className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/5 p-6 backdrop-blur-sm transition-all hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98]"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Lista</p>
-          <h3 className="mt-1.5 text-base font-semibold text-slate-900">{list.name}</h3>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#fb923c]/70">Lista de compra</p>
+          <h3 className="text-xl font-bold text-white group-hover:text-[#fb923c] transition-colors">{list.name}</h3>
         </div>
         {list.access === 'owner' ? (
-          <span className="rounded-xl bg-orange-100 px-2 py-1 text-xs font-semibold text-orange-700">
+          <span className="rounded-full bg-[#fb923c]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#fb923c] ring-1 ring-[#fb923c]/20">
             Propia
           </span>
         ) : (
-          <span className="rounded-xl bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700">
+          <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400 ring-1 ring-emerald-500/20">
             Compartida
           </span>
         )}
       </div>
-      <p className="mt-3 text-sm text-slate-500 group-hover:text-slate-700">
-        {list.access === 'owner'
-          ? 'Gestiona productos y marca compras en tiempo real.'
-          : `Lista compartida contigo (${list.role || 'editor'}).`}
-      </p>
+      
+      <div className="mt-6 flex items-center justify-between">
+        <p className="text-sm text-slate-500 group-hover:text-slate-400 transition-colors">
+          {list.access === 'owner'
+            ? 'Gestiona y compra en tiempo real'
+            : `Editor (${list.role || 'colaborador'})`}
+        </p>
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-white/30 group-hover:bg-[#fb923c]/20 group-hover:text-[#fb923c] transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </div>
+      </div>
     </Link>
   )
 })
@@ -303,15 +311,10 @@ export default function DashboardPage() {
 
   if (authLoading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6">
-        <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-xl">
-          <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
-            <div className="h-9 w-9 animate-spin rounded-full border-4 border-slate-200 border-t-orange-500" />
-            <div>
-              <p className="text-sm font-medium text-slate-900">Cargando listas</p>
-              <p className="text-xs text-slate-500">Preparando tu contenido.</p>
-            </div>
-          </div>
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-[#fb923c]" />
+          <p className="text-sm font-bold uppercase tracking-widest text-[#fb923c]">Sincronizando listas</p>
         </div>
       </main>
     )
@@ -319,48 +322,80 @@ export default function DashboardPage() {
 
   return (
     <>
-      <main className="min-h-screen px-4 py-6 pb-36 sm:px-6">
-        <div className="mx-auto w-full max-w-3xl space-y-4">
-          <header className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-orange-500">Listas</p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">Mis listas</h1>
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar lista..."
-              className="mt-4 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
-            />
+      <main className="min-h-screen container mx-auto px-6 py-12 pb-40">
+        <div className="max-w-4xl mx-auto space-y-10">
+          <header className="space-y-6">
+            <div className="space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Tu Centro de Control</span>
+              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+                Mis Listas
+              </h1>
+            </div>
+            
+            <div className="group relative">
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-500 group-focus-within:text-[#fb923c] transition-colors">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+              </div>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Busca por nombre de lista..."
+                className="w-full rounded-2xl border border-white/10 bg-white/5 py-4 pl-14 pr-6 text-sm text-white placeholder-slate-500 outline-none backdrop-blur-md transition-all focus:border-[#fb923c]/50 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/10"
+              />
+            </div>
           </header>
 
           {error && (
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-              {error}
+            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-6 py-4 text-sm font-medium text-rose-400 backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+                {error}
+              </div>
             </div>
           )}
 
           {loading && lists.length === 0 ? (
-            <section className="grid gap-3 sm:grid-cols-2">
+            <section className="grid gap-6 sm:grid-cols-2">
               {[0, 1, 2, 3].map((skeleton) => (
                 <div
                   key={skeleton}
-                  className="h-24 animate-pulse rounded-2xl border border-slate-200 bg-white/70"
+                  className="h-40 animate-pulse rounded-[2rem] border border-white/5 bg-white/5"
                 />
               ))}
             </section>
           ) : filteredLists.length === 0 ? (
-            <section className="rounded-3xl border border-dashed border-slate-300 bg-white/70 px-6 py-10 text-center">
-              <h2 className="text-xl font-semibold text-slate-900">
-                {lists.length === 0 ? 'No tienes listas todavía' : 'Sin resultados'}
-              </h2>
-              <p className="mt-2 text-sm text-slate-500">
-                {lists.length === 0
-                  ? 'Crea tu primera lista desde otra pantalla o funcionalidad.'
-                  : 'Prueba con otro texto en el buscador.'}
-              </p>
+            <section className="flex flex-col items-center justify-center py-20 text-center space-y-6">
+              <div className="h-20 w-20 flex items-center justify-center rounded-3xl bg-white/5 text-slate-600 ring-1 ring-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-white">
+                  {lists.length === 0 ? 'Todavía no tienes listas' : 'Sin resultados'}
+                </h2>
+                <p className="text-slate-500 text-sm max-w-xs mx-auto">
+                  {lists.length === 0
+                    ? 'Comienza creando tu primera lista de la compra ahora mismo.'
+                    : 'Prueba con otros términos de búsqueda.'}
+                </p>
+              </div>
+              {lists.length === 0 && (
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="inline-flex items-center justify-center rounded-xl bg-white/5 px-6 py-3 text-sm font-bold text-white ring-1 ring-white/10 transition-all hover:bg-white/10 active:scale-95"
+                >
+                  Crear mi primera lista
+                </button>
+              )}
             </section>
           ) : (
-            <section className="grid gap-3 sm:grid-cols-2">
+            <section className="grid gap-6 sm:grid-cols-2">
               {filteredLists.map((list) => (
                 <DashboardListCard key={list.id} list={list} />
               ))}
@@ -369,47 +404,61 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      <button
-        type="button"
-        onClick={() => setShowCreateModal(true)}
-        aria-label="Crear nueva lista"
-        className="fixed bottom-24 right-4 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-3xl font-semibold leading-none text-white shadow-lg transition hover:bg-orange-600 sm:bottom-24 sm:right-6"
-      >
-        +
-      </button>
+      {/* Floating Action Button */}
+      {!showCreateModal && (
+        <button
+          type="button"
+          onClick={() => setShowCreateModal(true)}
+          className="fixed bottom-28 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-xl shadow-[#fb923c]/40 transition-all hover:scale-110 active:scale-90"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+        </button>
+      )}
 
+      {/* Modern Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-end bg-slate-900/50 p-4 sm:items-center sm:justify-center sm:p-6">
-          <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-lg font-semibold text-slate-900">Nueva lista</h2>
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/80 backdrop-blur-sm p-4 sm:items-center sm:p-6">
+          <div 
+            className="w-full max-w-md animate-in slide-in-from-bottom duration-300 rounded-[2.5rem] border border-white/20 bg-slate-900 p-8 shadow-2xl [background:linear-gradient(135deg,rgba(15,23,42,1),rgba(30,41,59,1))]"
+          >
+            <div className="mb-8 flex items-center justify-between">
+              <div className="space-y-1">
+                <h2 className="text-2xl font-bold text-white tracking-tight">Nueva Lista</h2>
+                <p className="text-xs text-slate-500 font-medium uppercase tracking-widest text-slate-500">Comienza tu compra</p>
+              </div>
               <button
                 type="button"
-                onClick={() => {
-                  if (!creating) {
-                    setShowCreateModal(false)
-                  }
-                }}
-                className="rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+                onClick={() => !creating && setShowCreateModal(false)}
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-slate-400 hover:text-white transition-colors"
               >
-                Cerrar
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
-            <form onSubmit={createList} className="mt-4 space-y-3">
-              <input
-                type="text"
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-                placeholder="Nombre de la lista..."
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100"
-                autoFocus
-              />
+
+            <form onSubmit={createList} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-widest text-[#fb923c] ml-1">Nombre de la lista</label>
+                <input
+                  type="text"
+                  value={newListName}
+                  onChange={(e) => setNewListName(e.target.value)}
+                  placeholder="Ej: Súper semanal, Cena familia..."
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5"
+                  autoFocus
+                />
+              </div>
+              
               <button
                 type="submit"
                 disabled={creating || !newListName.trim()}
-                className="inline-flex w-full items-center justify-center rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-6 py-4 text-base font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100"
               >
-                {creating ? 'Creando...' : 'Crear lista'}
+                <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+                {creating ? 'Creando lista...' : 'Crear lista inteligente'}
               </button>
             </form>
           </div>

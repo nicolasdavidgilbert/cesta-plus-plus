@@ -64,7 +64,7 @@ type RealtimePayload = {
 }
 
 const inputClassName =
-  'w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-100'
+  'w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5'
 
 export default function ListDetailPage() {
   const router = useRouter()
@@ -617,498 +617,459 @@ export default function ListDetailPage() {
 
   if (authLoading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center px-4 py-10 sm:px-6">
-        <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-xl">
-          <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
-            <div className="h-9 w-9 animate-spin rounded-full border-4 border-slate-200 border-t-orange-500" />
-            <div>
-              <p className="text-sm font-medium text-slate-900">Cargando lista</p>
-              <p className="text-xs text-slate-500">Preparando tus productos.</p>
-            </div>
-          </div>
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-[#fb923c]" />
+          <p className="text-sm font-bold uppercase tracking-widest text-[#fb923c]">Sincronizando lista</p>
         </div>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-6xl space-y-6">
-        <header className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-xl sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
+    <main className="min-h-screen container mx-auto px-6 py-12 pb-40">
+      <div className="mx-auto w-full max-w-4xl space-y-10">
+        <header className="space-y-8">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div className="space-y-4">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-widest text-slate-500 transition hover:bg-slate-50"
+                className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-all hover:bg-white/10 hover:text-white"
               >
-                Volver
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 transition-transform group-hover:-translate-x-1">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Volver al Panel
               </Link>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-                {list?.name || 'Lista'}
-              </h1>
-              <p className="mt-2 text-sm text-slate-500">Marca tareas, ajusta cantidad y controla el total.</p>
+              <div className="space-y-1">
+                <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+                  {list?.name || 'Cargando...'}
+                </h1>
+                <p className="text-sm text-slate-500 font-medium tracking-tight">Gestiona productos, ajusta cantidades y controla tu presupuesto.</p>
+              </div>
             </div>
-          </div>
 
-          <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">
-                Total marcado
-              </p>
-              <p className="text-base font-semibold text-emerald-700">{checkedTotal.toFixed(2)} EUR</p>
-            </div>
-          </div>
-
-          <div className="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 p-1">
-            <button
-              onClick={() => setActiveTab('products')}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                activeTab === 'products'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:bg-white/70'
-              }`}
-            >
-              Productos
-            </button>
-            <button
-              onClick={() => setActiveTab('settings')}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                activeTab === 'settings'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:bg-white/70'
-              }`}
-            >
-              Ajustes
-            </button>
-            <button
-              onClick={() => setActiveTab('stats')}
-              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                activeTab === 'stats'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:bg-white/70'
-              }`}
-            >
-              Estadísticas
-            </button>
-          </div>
-        </header>
-
-        {activeTab === 'settings' && (
-          <section className="space-y-4 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-xl sm:p-6">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <h2 className="text-lg font-semibold text-slate-900">Ajustes de lista</h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Aquí puedes editar y compartir la lista. La vista principal queda enfocada en productos.
-              </p>
-
-              <div className="mt-4 space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Nombre de la lista</label>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <input
-                    type="text"
-                    value={listNameDraft}
-                    onChange={(e) => setListNameDraft(e.target.value)}
-                    disabled={!canManageMembers}
-                    className={inputClassName}
-                    placeholder="Nombre de la lista"
+            <div className="relative group overflow-hidden rounded-[2rem] border border-[#fb923c]/20 bg-[#fb923c]/5 p-6 backdrop-blur-md min-w-[240px]">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#fb923c]/10 to-transparent opacity-50" />
+              <div className="relative space-y-1">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]/80">Total Marcado</p>
+                <p className="text-3xl font-black text-white">{checkedTotal.toFixed(2)} <span className="text-sm font-bold text-[#fb923c]">EUR</span></p>
+                <div className="mt-4 w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#fb923c] to-[#f59e0b] transition-all duration-700 ease-out"
+                    style={{ width: `${progress}%` }}
                   />
-                  {canManageMembers && (
-                    <button
-                      onClick={() => void updateListName()}
-                      disabled={savingListName || !listNameDraft.trim()}
-                      className="inline-flex shrink-0 items-center justify-center rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {savingListName ? 'Guardando...' : 'Guardar nombre'}
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <h3 className="text-base font-semibold text-slate-900">Compartir lista</h3>
-              <p className="mt-1 text-sm text-slate-500">
-                Comparte por email y/o crea un enlace para que otras personas puedan usar esta lista.
-              </p>
-
-              {!canManageMembers ? (
-                <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
-                  Solo el propietario puede gestionar los accesos compartidos.
-                </p>
-              ) : (
-                <>
-                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                    <input
-                      type="email"
-                      value={shareEmail}
-                      onChange={(e) => setShareEmail(e.target.value)}
-                      placeholder="email@ejemplo.com"
-                      className={inputClassName}
-                    />
-                    <button
-                      onClick={() => void addMemberByEmail()}
-                      disabled={sharingEmail || !shareEmail.trim()}
-                      className="inline-flex shrink-0 items-center justify-center rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {sharingEmail ? 'Compartiendo...' : 'Compartir por email'}
-                    </button>
-                  </div>
-
-                  <div className="mt-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500">
-                    Consejo: si la persona no está registrada aún, usa un enlace de invitación.
-                  </div>
-
-                  <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-3">
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">Enlaces de invitación</p>
-                        <p className="text-xs text-slate-500">Genera enlaces para enviar por WhatsApp o Gmail.</p>
-                      </div>
-                      <button
-                        onClick={() => void createInviteLink()}
-                        disabled={generatingInviteLink}
-                        className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {generatingInviteLink ? 'Generando...' : 'Generar enlace'}
-                      </button>
-                    </div>
-
-                    <div className="mt-3 space-y-2">
-                      {loadingInviteLinks ? (
-                        <p className="rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-500">Cargando enlaces...</p>
-                      ) : inviteLinks.length === 0 ? (
-                        <p className="rounded-xl bg-slate-50 px-3 py-2 text-sm text-slate-500">
-                          No hay enlaces activos.
-                        </p>
-                      ) : (
-                        inviteLinks.map((invite) => {
-                          const inviteUrl = buildInviteUrl(invite.token)
-                          return (
-                            <div
-                              key={invite.id}
-                              className="rounded-xl border border-slate-200 bg-slate-50 p-3"
-                            >
-                              <p className="truncate text-xs text-slate-600">{inviteUrl}</p>
-                              <div className="mt-2 flex flex-wrap gap-2">
-                                <button
-                                  onClick={() => void copyInviteLink(invite.token)}
-                                  className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
-                                >
-                                  {copiedLinkToken === invite.token ? 'Copiado' : 'Copiar'}
-                                </button>
-                                <button
-                                  onClick={() => openGmailForInvite(invite.token)}
-                                  className="inline-flex items-center rounded-lg border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100"
-                                >
-                                  Abrir Gmail
-                                </button>
-                                <button
-                                  onClick={() => void revokeInviteLink(invite)}
-                                  disabled={revokingInviteId === invite.id}
-                                  className="inline-flex items-center rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
-                                >
-                                  {revokingInviteId === invite.id ? 'Revocando...' : 'Revocar'}
-                                </button>
-                              </div>
-                            </div>
-                          )
-                        })
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 space-y-2 rounded-2xl border border-slate-200 bg-white p-3">
-                    <div className="rounded-xl bg-slate-50 p-3 text-sm">
-                      <p className="font-semibold text-slate-900">Propietario</p>
-                      <p className="mt-1 break-all text-xs text-slate-500">{list?.owner_id}</p>
-                    </div>
-                    {members.length === 0 ? (
-                      <p className="px-1 py-2 text-sm text-slate-500">Aún no hay miembros compartidos.</p>
-                    ) : (
-                      members.map((member) => (
-                        <div
-                          key={member.id}
-                          className="flex flex-col gap-2 rounded-xl bg-slate-50 p-3 sm:flex-row sm:items-center sm:justify-between"
-                        >
-                          <div>
-                            <p className="text-sm font-semibold text-slate-900">editor</p>
-                            <p className="mt-1 break-all text-xs text-slate-500">{member.user_id}</p>
-                          </div>
-                          <button
-                            onClick={() => void removeMember(member)}
-                            disabled={removingMemberId === member.id}
-                            className="inline-flex items-center justify-center rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            {removingMemberId === member.id ? 'Quitando...' : 'Quitar acceso'}
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {canManageMembers && (
-              <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
-                <h3 className="text-base font-semibold text-rose-700">Zona peligrosa</h3>
-                <p className="mt-1 text-sm text-rose-600">
-                  Eliminar la lista borra todos los elementos asociados para todos los usuarios compartidos.
-                </p>
-                <button
-                  onClick={deleteList}
-                  className="mt-3 inline-flex items-center rounded-2xl border border-rose-300 bg-white px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
-                >
-                  Eliminar lista
-                </button>
-              </div>
-            )}
-          </section>
-        )}
-
-        {activeTab === 'stats' && (
-          <section className="space-y-4 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-xl sm:p-6">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <article className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Pendientes</p>
-                <p className="mt-1.5 text-xl font-semibold text-slate-900">{uncheckedItems.length}</p>
-              </article>
-              <article className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Completados</p>
-                <p className="mt-1.5 text-xl font-semibold text-slate-900">{checkedItems.length}</p>
-              </article>
-              <article className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Total estimado</p>
-                <p className="mt-1.5 text-xl font-semibold text-emerald-600">{total.toFixed(2)} EUR</p>
-              </article>
-              <article className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Progreso</p>
-                <p className="mt-1.5 text-xl font-semibold text-slate-900">{progress.toFixed(0)}%</p>
-              </article>
-            </div>
-
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-medium text-emerald-800">Avance del gasto</p>
-                <p className="text-base font-semibold text-emerald-700">{checkedTotal.toFixed(2)} EUR</p>
-              </div>
-              <div className="mt-2 h-2 rounded-full bg-emerald-100">
-                <div
-                  className="h-full rounded-full bg-emerald-500 transition-all"
-                  style={{ width: `${Math.min(progress, 100)}%` }}
-                />
-              </div>
-            </div>
-          </section>
-        )}
-
-        {activeTab === 'products' && (
-          <button
-            onClick={() => setShowAddProduct(true)}
-            className="inline-flex w-full items-center justify-center rounded-2xl border-2 border-dashed border-orange-300 bg-orange-50 px-4 py-4 text-sm font-semibold text-orange-700 transition hover:bg-orange-100"
-          >
-            + Añadir producto
-          </button>
-        )}
+          <div className="inline-flex items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-md">
+            {[
+              { id: 'products', label: 'Productos', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25-2.25M12 13.875V7.5M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg> },
+              { id: 'settings', label: 'Gestión', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg> },
+              { id: 'stats', label: 'Estadísticas', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" /><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" /></svg> },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold uppercase tracking-widest transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-lg shadow-[#fb923c]/20'
+                    : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </header>
 
         {error && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-6 py-4 text-sm font-medium text-rose-400 backdrop-blur-md">
             {error}
           </div>
         )}
 
-        {activeTab === 'products' && (loading ? (
-          <section className="grid gap-3 sm:grid-cols-2">
-            {[0, 1, 2, 3].map((skeleton) => (
-              <div
-                key={skeleton}
-                className="h-24 animate-pulse rounded-2xl border border-slate-200 bg-white/70"
-              />
+        {loading ? (
+          <div className="grid gap-4 py-10">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-20 animate-pulse rounded-2xl border border-white/5 bg-white/5" />
             ))}
-          </section>
-        ) : items.length === 0 ? (
-          <section className="rounded-3xl border border-dashed border-slate-300 bg-white/70 px-6 py-10 text-center">
-            <h2 className="text-xl font-semibold text-slate-900">Lista vacía</h2>
-            <p className="mt-2 text-sm text-slate-500">Añade productos para empezar tu compra.</p>
-          </section>
-        ) : (
-          <section className="space-y-5">
-            {uncheckedItems.length > 0 && (
-              <div className="space-y-3">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Pendientes</h2>
-                <div className="space-y-2.5">
-                  {uncheckedItems.map((item) => (
-                    <article
-                      key={item.id}
-                      className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-3.5"
-                    >
-                      <div className="flex items-start gap-3">
-                        <button
-                          onClick={() => void toggleChecked(item)}
-                          className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-slate-300 transition hover:border-emerald-500"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-semibold text-slate-900 sm:text-base">
-                            {item.product?.title}
-                          </p>
-                          {item.product?.current_price != null && (
-                            <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs sm:text-sm">
-                              <p className="text-emerald-600">
-                                {item.product.current_price.toFixed(2)} EUR por unidad
-                              </p>
-                              <span className="text-slate-400">•</span>
-                              <p className="font-medium text-slate-700">
-                                Subtotal: {(item.product.current_price * item.quantity).toFixed(2)} EUR
+          </div>
+        ) : activeTab === 'products' ? (
+          <div className="space-y-8">
+            {uncheckedItems.length === 0 && checkedItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center space-y-6">
+                <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-white/5 text-slate-600 ring-1 ring-white/10">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                  </svg>
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-xl font-bold text-white tracking-tight">Tu lista está vacía</h2>
+                  <p className="text-slate-500 text-sm max-w-xs mx-auto">Añade productos de tu catálogo o crea nuevos para empezar a comprar.</p>
+                </div>
+                <button
+                  onClick={() => setShowAddProduct(true)}
+                  className="group relative inline-flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-8 py-4 text-base font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95"
+                >
+                  <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+                  Añadir mi primer producto
+                </button>
+              </div>
+            ) : (
+              <section className="space-y-6">
+                {uncheckedItems.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Por comprar</p>
+                    <div className="space-y-3">
+                      {uncheckedItems.map((item) => (
+                        <div 
+                          key={item.id} 
+                          className="group relative flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-4 backdrop-blur-sm transition-all hover:bg-white/10"
+                        >
+                          <div className="flex items-center gap-4 flex-1">
+                            <button
+                              onClick={() => toggleChecked(item)}
+                              className="group/check relative flex h-7 w-7 items-center justify-center rounded-xl border-2 border-white/10 bg-white/5 text-transparent transition-all hover:border-[#fb923c]/50 active:scale-90"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="currentColor" className="w-4 h-4 group-hover/check:text-[#fb923c]/20">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                              </svg>
+                            </button>
+                            <div className="space-y-0.5">
+                              <h4 className="text-sm font-bold text-white tracking-tight">{item.product?.title || 'Producto desconocido'}</h4>
+                              <p className="text-xs font-semibold text-[#fb923c]/60">
+                                {item.product?.current_price ? `${(item.product.current_price * item.quantity).toFixed(2)} EUR` : 'Sin precio'}
                               </p>
                             </div>
-                          )}
+                          </div>
+                          
+                          <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-1.5 rounded-xl border border-white/5 bg-white/5 p-1 ring-1 ring-white/5">
+                              <button
+                                onClick={() => updateQuantity(item, -1)}
+                                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 transition-all"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
+                                </svg>
+                              </button>
+                              <span className="w-6 text-center text-xs font-bold text-white">{item.quantity}</span>
+                              <button
+                                onClick={() => updateQuantity(item, 1)}
+                                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-emerald-500/20 hover:text-emerald-400 transition-all"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                              </button>
+                            </div>
+                            <button
+                              onClick={() => removeItem(item.id)}
+                              className="hidden group-hover:flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-rose-500/10 hover:text-rose-500 transition-all"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
-                      </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2.5">
-                        <div className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
-                          <button
-                            onClick={() => void updateQuantity(item, -1)}
-                            className="h-8 w-8 rounded-lg text-base font-semibold text-slate-700 transition hover:bg-white"
-                          >
-                            -
-                          </button>
-                          <span className="min-w-8 text-center text-sm font-semibold text-slate-900">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => void updateQuantity(item, 1)}
-                            className="h-8 w-8 rounded-lg text-base font-semibold text-slate-700 transition hover:bg-white"
-                          >
-                            +
-                          </button>
-                        </div>
-                        <button
-                          onClick={() => void removeItem(item.id)}
-                          className="inline-flex items-center rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-100"
+                {checkedItems.length > 0 && (
+                  <div className="space-y-3">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-500/60 ml-1">En el carrito</p>
+                    <div className="space-y-3 opacity-60">
+                      {checkedItems.map((item) => (
+                        <div 
+                          key={item.id} 
+                          className="group relative flex items-center justify-between rounded-2xl border border-white/5 bg-slate-900/40 p-4 transition-all hover:bg-slate-900/60"
                         >
-                          Quitar
-                        </button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
+                          <div className="flex items-center gap-4 flex-1">
+                            <button
+                              onClick={() => toggleChecked(item)}
+                              className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-90"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                              </svg>
+                            </button>
+                            <div className="space-y-0.5">
+                              <h4 className="text-sm font-bold text-slate-300 tracking-tight line-through decoration-emerald-500/50">{item.product?.title}</h4>
+                              <p className="text-xs font-semibold text-slate-500">
+                                {item.product?.current_price ? `${(item.product.current_price * item.quantity).toFixed(2)} EUR` : '-'}
+                              </p>
+                            </div>
+                          </div>
+                          <span className="text-xs font-black text-slate-600 bg-white/5 px-2.5 py-1 rounded-full">{item.quantity} ud.</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </section>
             )}
-
-            {checkedItems.length > 0 && (
-              <div className="space-y-3">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Completados</h2>
-                <div className="space-y-2">
-                  {checkedItems.map((item) => (
-                    <article
-                      key={item.id}
-                      className="rounded-xl border border-slate-200 bg-slate-50 p-3 opacity-80"
-                    >
-                      <div className="flex items-center gap-3">
+            
+            <button
+              onClick={() => setShowAddProduct(true)}
+              className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 py-4 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10 active:scale-[0.98]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4 mr-2 text-[#fb923c]">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Añadir Producto
+            </button>
+          </div>
+        ) : activeTab === 'settings' ? (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <section className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 backdrop-blur-md space-y-10">
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">General</span>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-400 ml-1">Nombre de la lista</label>
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                      <input
+                        type="text"
+                        value={listNameDraft}
+                        onChange={(e) => setListNameDraft(e.target.value)}
+                        disabled={!canManageMembers}
+                        className={inputClassName}
+                        placeholder="Nombre de la lista"
+                      />
+                      {canManageMembers && (
                         <button
-                          onClick={() => void toggleChecked(item)}
-                          className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-emerald-500 bg-emerald-500 text-[10px] text-white"
+                          onClick={() => void updateListName()}
+                          disabled={savingListName || !listNameDraft.trim()}
+                          className="group relative flex shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white px-8 py-3 text-sm font-bold text-slate-900 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                         >
-                          ✓
+                          {savingListName ? 'Guardando...' : 'Actualizar'}
                         </button>
-                        <p className="min-w-0 flex-1 truncate text-sm font-medium text-slate-500 line-through">
-                          {item.product?.title}
-                        </p>
-                        {item.product?.current_price != null && (
-                          <p className="text-xs font-semibold text-emerald-700">
-                            {(item.product.current_price * item.quantity).toFixed(2)} EUR
-                          </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-white/5">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Compartir con Email</span>
+                  {!canManageMembers ? (
+                    <p className="rounded-2xl bg-amber-500/10 p-4 text-xs font-medium text-amber-500 ring-1 ring-amber-500/20">
+                      Solo el propietario puede gestionar los accesos compartidos.
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex flex-col gap-3 sm:flex-row">
+                        <input
+                          type="email"
+                          value={shareEmail}
+                          onChange={(e) => setShareEmail(e.target.value)}
+                          placeholder="email@ejemplo.com"
+                          className={inputClassName}
+                        />
+                        <button
+                          onClick={() => void addMemberByEmail()}
+                          disabled={sharingEmail || !shareEmail.trim()}
+                          className="group relative flex shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-8 py-3 text-sm font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                        >
+                          {sharingEmail ? 'Compartiendo...' : 'Compartir'}
+                        </button>
+                      </div>
+                      
+                      {members.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Miembros actuales</p>
+                          <div className="grid gap-2">
+                            {members.map((member) => (
+                              <div key={member.id} className="flex items-center justify-between rounded-xl bg-white/5 p-3 ring-1 ring-white/5">
+                                <span className="text-sm font-medium text-slate-300">{member.user_id}</span>
+                                <button
+                                  onClick={() => removeMember(member)}
+                                  disabled={removingMemberId === member.id}
+                                  className="text-xs font-bold text-rose-500 hover:text-rose-400 p-2"
+                                >
+                                  {removingMemberId === member.id ? 'Quitando...' : 'Quitar'}
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-white/5">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Enlaces de Invitación</span>
+                  {canManageMembers && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-slate-500 max-w-[240px]">Envía un enlace rápido por WhatsApp o Telegram.</p>
+                        <button
+                          onClick={() => void createInviteLink()}
+                          disabled={generatingInviteLink}
+                          className="flex items-center justify-center rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-white ring-1 ring-white/20 transition-all hover:bg-white/10"
+                        >
+                          {generatingInviteLink ? 'Generando...' : 'Nuevo Enlace'}
+                        </button>
+                      </div>
+
+                      <div className="grid gap-3">
+                        {loadingInviteLinks ? (
+                          <div className="h-20 animate-pulse rounded-2xl bg-white/5" />
+                        ) : inviteLinks.length === 0 ? (
+                          <p className="text-center py-6 text-xs text-slate-600 font-medium italic">No hay enlaces activos en este momento.</p>
+                        ) : (
+                          inviteLinks.map((invite) => (
+                            <div key={invite.id} className="flex flex-col gap-3 rounded-2xl bg-slate-900/50 p-4 ring-1 ring-white/5">
+                              <p className="truncate text-[10px] font-mono text-slate-500 uppercase tracking-tighter">{buildInviteUrl(invite.token)}</p>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => void copyInviteLink(invite.token)}
+                                  className={`flex-1 flex items-center justify-center rounded-xl py-2.5 text-[10px] font-bold uppercase transition-all ${
+                                    copiedLinkToken === invite.token ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                                  }`}
+                                >
+                                  {copiedLinkToken === invite.token ? 'Enlace Copiado' : 'Copiar URL'}
+                                </button>
+                                <button
+                                  onClick={() => revokeInviteLink(invite)}
+                                  disabled={revokingInviteId === invite.id}
+                                  className="flex-1 flex items-center justify-center rounded-xl bg-rose-500/10 py-2.5 text-[10px] font-bold uppercase text-rose-500 hover:bg-rose-500/20 transition-all"
+                                >
+                                  Revocar
+                                </button>
+                              </div>
+                            </div>
+                          ))
                         )}
-                        <button
-                          onClick={() => void removeItem(item.id)}
-                          className="inline-flex items-center rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-100"
-                        >
-                          Quitar
-                        </button>
                       </div>
-                    </article>
-                  ))}
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
-          </section>
-        ))}
+
+              {canManageMembers && (
+                <div className="pt-10 space-y-4">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-rose-500/80">Zona de Riesgo</span>
+                  <button
+                    onClick={() => void deleteList()}
+                    className="flex w-full items-center justify-center rounded-2xl border border-rose-500/20 bg-rose-500/5 py-4 text-sm font-bold text-rose-500 transition-all hover:bg-rose-500 hover:text-white"
+                  >
+                    Eliminar Lista Permanentemente
+                  </button>
+                </div>
+              )}
+            </section>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-indigo-500/10 text-indigo-400 ring-1 ring-indigo-500/20">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
+              </svg>
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold text-white tracking-tight">Estamos preparando tus datos</h2>
+              <p className="text-slate-500 text-sm max-w-xs mx-auto">Pronto podrás visualizar informes detallados sobre tus hábitos de compra y ahorro.</p>
+            </div>
+          </div>
+        )}
       </div>
 
-      {activeTab === 'products' && showAddProduct && (
-        <div className="fixed inset-0 z-50 flex items-end bg-slate-900/50 p-3 sm:items-center sm:justify-center sm:p-6">
-          <div className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-6">
-            <h3 className="text-xl font-semibold text-slate-900">Añadir producto</h3>
-            <p className="mt-1 text-sm text-slate-500">Usa uno existente o crea uno nuevo.</p>
+      {/* Modern Add Product Modal */}
+      {showAddProduct && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 sm:p-6">
+          <div className="w-full max-w-2xl max-h-[90vh] flex flex-col rounded-[2.5rem] border border-white/10 bg-slate-900 shadow-2xl overflow-hidden">
+            <div className="p-8 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+              <div className="space-y-1">
+                <h3 className="text-2xl font-bold text-white tracking-tight">Gestionar Productos</h3>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Añade o crea nuevos ítems</p>
+              </div>
+              <button
+                onClick={() => setShowAddProduct(false)}
+                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-slate-400 hover:text-white transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
 
-            <div className="mt-5 space-y-2">
-              <h4 className="text-sm font-semibold text-slate-700">Productos existentes</h4>
-              <div className="max-h-44 space-y-2 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50 p-2">
-                {products.length === 0 ? (
-                  <p className="p-2 text-sm text-slate-500">No hay productos existentes.</p>
-                ) : (
-                  products.map((product) => (
-                    <button
-                      key={product.id}
-                      onClick={() => void addExistingProduct(product.id)}
-                      className="flex w-full items-center justify-between rounded-xl bg-white px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-orange-50"
-                    >
-                      <span>{product.title}</span>
-                      {product.current_price !== null && (
-                        <span className="text-xs font-semibold text-emerald-600">
-                          {product.current_price.toFixed(2)} EUR
-                        </span>
-                      )}
-                    </button>
-                  ))
-                )}
+            <div className="flex-1 overflow-y-auto p-8 space-y-10">
+              <div className="space-y-6">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Tu Catálogo</span>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {products.length === 0 ? (
+                    <p className="col-span-full py-10 text-center text-xs text-slate-600 italic">No tienes productos guardados en tu catálogo.</p>
+                  ) : (
+                    products.map((p) => {
+                      const isAdded = items.some((i) => i.product_id === p.id)
+                      return (
+                        <button
+                          key={p.id}
+                          onClick={() => void addExistingProduct(p.id)}
+                          className="flex items-center justify-between rounded-[1.25rem] border border-white/5 bg-white/5 p-4 text-left transition-all hover:bg-white/10 hover:border-[#fb923c]/20"
+                        >
+                          <div className="space-y-0.5">
+                            <p className="text-sm font-bold text-white leading-tight">{p.title}</p>
+                            <p className="text-[10px] font-bold text-[#fb923c]">{p.current_price ? `${p.current_price.toFixed(2)} EUR` : 'S/P'}</p>
+                          </div>
+                          <div className={`h-8 w-8 flex items-center justify-center rounded-lg transition-all ${isAdded ? 'bg-emerald-500 text-white' : 'bg-white/5 text-slate-500'}`}>
+                            {isAdded ? (
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                              </svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                              </svg>
+                            )}
+                          </div>
+                        </button>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-6 pt-4 border-t border-white/5">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Nuevo Producto Rápido</span>
+                <form onSubmit={createAndAddProduct} className="grid gap-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <input
+                      type="text"
+                      value={newProduct.title}
+                      onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
+                      placeholder="Nombre del producto *"
+                      className={inputClassName}
+                      required
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={newProduct.price}
+                      onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                      placeholder="Precio estimado (EUR)"
+                      className={inputClassName}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={creatingProduct || !newProduct.title.trim()}
+                    className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-white animate-pulse-once px-6 py-4 text-base font-bold text-slate-900 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                  >
+                    {creatingProduct ? 'Creando...' : 'Crear y Añadir'}
+                  </button>
+                </form>
               </div>
             </div>
-
-            <div className="mt-5 space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
-              <h4 className="text-sm font-semibold text-slate-700">Crear nuevo producto</h4>
-              <form onSubmit={createAndAddProduct} className="space-y-3">
-                <input
-                  type="text"
-                  value={newProduct.title}
-                  onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
-                  placeholder="Nombre *"
-                  className={inputClassName}
-                  required
-                />
-                <input
-                  type="text"
-                  value={newProduct.description}
-                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                  placeholder="Descripción"
-                  className={inputClassName}
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={newProduct.price}
-                  onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-                  placeholder="Precio (EUR)"
-                  className={inputClassName}
-                />
-                <button
-                  type="submit"
-                  disabled={creatingProduct || !newProduct.title.trim()}
-                  className="inline-flex w-full items-center justify-center rounded-2xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {creatingProduct ? 'Creando...' : 'Crear y añadir'}
-                </button>
-              </form>
-            </div>
-
-            <button
-              onClick={() => setShowAddProduct(false)}
-              className="mt-4 inline-flex w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Cancelar
-            </button>
           </div>
         </div>
       )}
