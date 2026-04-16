@@ -80,7 +80,7 @@ export default function ListDetailPage() {
   const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '' })
   const [creatingProduct, setCreatingProduct] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<'products' | 'settings'>('products')
+  const [activeTab, setActiveTab] = useState<'products' | 'settings' | 'stats'>('products')
   const [listNameDraft, setListNameDraft] = useState('')
   const [savingListName, setSavingListName] = useState(false)
   const [shareEmail, setShareEmail] = useState('')
@@ -648,50 +648,18 @@ export default function ListDetailPage() {
               </h1>
               <p className="mt-2 text-sm text-slate-500">Marca tareas, ajusta cantidad y controla el total.</p>
             </div>
-            <button
-              onClick={() => setActiveTab((prev) => (prev === 'products' ? 'settings' : 'products'))}
-              className="inline-flex items-center rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              {activeTab === 'products' ? 'Ajustes' : 'Ver productos'}
-            </button>
           </div>
 
-          <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Pendientes</p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900">{uncheckedItems.length}</p>
-            </article>
-            <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Completados</p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900">{checkedItems.length}</p>
-            </article>
-            <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Llevas</p>
-              <p className="mt-2 text-lg font-semibold text-emerald-600">{checkedTotal.toFixed(2)} EUR</p>
-            </article>
-            <article className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Total estimado</p>
-              <p className="mt-2 text-lg font-semibold text-emerald-600">{total.toFixed(2)} EUR</p>
-            </article>
-          </div>
-
-          <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium text-emerald-800">Gasto acumulado</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">
+                Total marcado
+              </p>
               <p className="text-base font-semibold text-emerald-700">{checkedTotal.toFixed(2)} EUR</p>
             </div>
-            <div className="mt-3 h-2 rounded-full bg-emerald-100">
-              <div
-                className="h-full rounded-full bg-emerald-500 transition-all"
-                style={{ width: `${Math.min(progress, 100)}%` }}
-              />
-            </div>
-            <p className="mt-2 text-xs text-emerald-700">
-              Llevas {progress.toFixed(0)}% del total estimado de la lista.
-            </p>
           </div>
 
-          <div className="mt-5 inline-flex rounded-2xl border border-slate-200 bg-slate-50 p-1">
+          <div className="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 p-1">
             <button
               onClick={() => setActiveTab('products')}
               className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
@@ -711,6 +679,16 @@ export default function ListDetailPage() {
               }`}
             >
               Ajustes
+            </button>
+            <button
+              onClick={() => setActiveTab('stats')}
+              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                activeTab === 'stats'
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-600 hover:bg-white/70'
+              }`}
+            >
+              Estadísticas
             </button>
           </div>
         </header>
@@ -888,10 +866,46 @@ export default function ListDetailPage() {
           </section>
         )}
 
+        {activeTab === 'stats' && (
+          <section className="space-y-4 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-xl sm:p-6">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <article className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Pendientes</p>
+                <p className="mt-1.5 text-xl font-semibold text-slate-900">{uncheckedItems.length}</p>
+              </article>
+              <article className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Completados</p>
+                <p className="mt-1.5 text-xl font-semibold text-slate-900">{checkedItems.length}</p>
+              </article>
+              <article className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Total estimado</p>
+                <p className="mt-1.5 text-xl font-semibold text-emerald-600">{total.toFixed(2)} EUR</p>
+              </article>
+              <article className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Progreso</p>
+                <p className="mt-1.5 text-xl font-semibold text-slate-900">{progress.toFixed(0)}%</p>
+              </article>
+            </div>
+
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-medium text-emerald-800">Avance del gasto</p>
+                <p className="text-base font-semibold text-emerald-700">{checkedTotal.toFixed(2)} EUR</p>
+              </div>
+              <div className="mt-2 h-2 rounded-full bg-emerald-100">
+                <div
+                  className="h-full rounded-full bg-emerald-500 transition-all"
+                  style={{ width: `${Math.min(progress, 100)}%` }}
+                />
+              </div>
+            </div>
+          </section>
+        )}
+
         {activeTab === 'products' && (
           <button
             onClick={() => setShowAddProduct(true)}
-            className="inline-flex w-full items-center justify-center rounded-3xl border-2 border-dashed border-orange-300 bg-orange-50 px-4 py-5 text-sm font-semibold text-orange-700 transition hover:bg-orange-100"
+            className="inline-flex w-full items-center justify-center rounded-2xl border-2 border-dashed border-orange-300 bg-orange-50 px-4 py-4 text-sm font-semibold text-orange-700 transition hover:bg-orange-100"
           >
             + Añadir producto
           </button>
@@ -918,26 +932,30 @@ export default function ListDetailPage() {
             <p className="mt-2 text-sm text-slate-500">Añade productos para empezar tu compra.</p>
           </section>
         ) : (
-          <section className="space-y-6">
+          <section className="space-y-5">
             {uncheckedItems.length > 0 && (
               <div className="space-y-3">
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Pendientes</h2>
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {uncheckedItems.map((item) => (
                     <article
                       key={item.id}
-                      className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
+                      className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm sm:p-3.5"
                     >
                       <div className="flex items-start gap-3">
                         <button
                           onClick={() => void toggleChecked(item)}
-                          className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-slate-300 transition hover:border-emerald-500"
+                          className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-slate-300 transition hover:border-emerald-500"
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-base font-semibold text-slate-900">{item.product?.title}</p>
+                          <p className="truncate text-sm font-semibold text-slate-900 sm:text-base">
+                            {item.product?.title}
+                          </p>
                           {item.product?.current_price != null && (
-                            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
-                              <p className="text-emerald-600">{item.product.current_price.toFixed(2)} EUR por unidad</p>
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs sm:text-sm">
+                              <p className="text-emerald-600">
+                                {item.product.current_price.toFixed(2)} EUR por unidad
+                              </p>
                               <span className="text-slate-400">•</span>
                               <p className="font-medium text-slate-700">
                                 Subtotal: {(item.product.current_price * item.quantity).toFixed(2)} EUR
@@ -947,27 +965,27 @@ export default function ListDetailPage() {
                         </div>
                       </div>
 
-                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                        <div className="inline-flex items-center rounded-2xl border border-slate-200 bg-slate-50 p-1">
+                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2.5">
+                        <div className="inline-flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
                           <button
                             onClick={() => void updateQuantity(item, -1)}
-                            className="h-9 w-9 rounded-xl text-lg font-semibold text-slate-700 transition hover:bg-white"
+                            className="h-8 w-8 rounded-lg text-base font-semibold text-slate-700 transition hover:bg-white"
                           >
                             -
                           </button>
-                          <span className="min-w-10 text-center text-sm font-semibold text-slate-900">
+                          <span className="min-w-8 text-center text-sm font-semibold text-slate-900">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => void updateQuantity(item, 1)}
-                            className="h-9 w-9 rounded-xl text-lg font-semibold text-slate-700 transition hover:bg-white"
+                            className="h-8 w-8 rounded-lg text-base font-semibold text-slate-700 transition hover:bg-white"
                           >
                             +
                           </button>
                         </div>
                         <button
                           onClick={() => void removeItem(item.id)}
-                          className="inline-flex items-center rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-100"
+                          className="inline-flex items-center rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-100"
                         >
                           Quitar
                         </button>
@@ -985,12 +1003,12 @@ export default function ListDetailPage() {
                   {checkedItems.map((item) => (
                     <article
                       key={item.id}
-                      className="rounded-2xl border border-slate-200 bg-slate-50 p-4 opacity-80"
+                      className="rounded-xl border border-slate-200 bg-slate-50 p-3 opacity-80"
                     >
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => void toggleChecked(item)}
-                          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-emerald-500 bg-emerald-500 text-white"
+                          className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-emerald-500 bg-emerald-500 text-[10px] text-white"
                         >
                           ✓
                         </button>
@@ -1004,7 +1022,7 @@ export default function ListDetailPage() {
                         )}
                         <button
                           onClick={() => void removeItem(item.id)}
-                          className="inline-flex items-center rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-100"
+                          className="inline-flex items-center rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-100"
                         >
                           Quitar
                         </button>

@@ -3,9 +3,21 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import { insforge } from '@/lib/insforge'
 
+type UserProfile = {
+  name?: string
+  avatar_url?: string
+  [key: string]: unknown
+}
+
 type User = {
   id: string
   email: string
+  emailVerified?: boolean
+  providers?: string[]
+  createdAt?: string
+  updatedAt?: string
+  profile?: UserProfile | null
+  metadata?: Record<string, unknown> | null
   name?: string
 }
 
@@ -16,6 +28,8 @@ type UserContextType = {
   signUp: (email: string, password: string, name: string) => Promise<{ error?: string; requireVerification?: boolean }>
   signOut: () => Promise<void>
   verifyEmail: (email: string, code: string) => Promise<{ error?: string }>
+  refreshUser: () => Promise<void>
+  updateProfile: (profile: Record<string, unknown>) => Promise<{ error?: string }>
 }
 
 const UserContext = createContext<UserContextType | null>(null)
@@ -24,11 +38,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
+  function normalizeUser(raw: unknown): User {
+    const userData = raw as User
+    const profileName = userData.profile?.name
+    return {
+      ...userData,
+      name: typeof profileName === 'string' && profileName.trim() ? profileName.trim() : userData.name,
+    }
+  }
+
   const checkUser = useCallback(async () => {
     const { data, error } = await insforge.auth.getCurrentUser()
 
     if (!error && data?.user) {
-      setUser(data.user as User)
+      setUser(normalizeUser(data.user))
     } else {
       setUser(null)
     }
@@ -46,7 +69,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const { data, error } = await insforge.auth.signInWithPassword({ email, password })
     if (error) return { error: error.message }
     if (data?.user) {
-      setUser(data.user as User)
+      setUser(normalizeUser(data.user))
     }
     return {}
   }
@@ -63,7 +86,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return { requireVerification: true }
     }
     if (data?.user) {
-      setUser(data.user as User)
+      setUser(normalizeUser(data.user))
     }
     return {}
   }
@@ -72,8 +95,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const { data, error } = await insforge.auth.verifyEmail({ email, otp: code })
     if (error) return { error: error.message }
     if (data?.user) {
-      setUser(data.user as User)
+      setUser(normalizeUser(data.user))
     }
+    return {}
+  }
+
+  async function refreshUser() {
+    await checkUser()
+  }
+
+  async function updateProfile(profile: Record<string, unknown>) {
+    const { error } = await insforge.auth.setProfile(profile)
+    if (error) return { error: error.message }
+    await checkUser()
     return {}
   }
 
@@ -83,7 +117,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <UserContext.Provider value={{ user, loading, signIn, signUp, signOut, verifyEmail }}>
+    <UserContext.Provider
+      value={{ user, loading, signIn, signUp, signOut, verifyEmail, refreshUser, updateProfile }}
+    >
       {children}
     </UserContext.Provider>
   )

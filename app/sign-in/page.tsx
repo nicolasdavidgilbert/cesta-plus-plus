@@ -46,13 +46,26 @@ export default function SignInPage() {
     setError('')
     setLoading(true)
 
+    const hostname = window.location.hostname
+    const isLocalhost =
+      hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]'
+    if (!window.isSecureContext && !isLocalhost) {
+      setError('Google OAuth requiere HTTPS si no usas localhost.')
+      setLoading(false)
+      return
+    }
+
     const { error } = await insforge.auth.signInWithOAuth({
       provider,
       redirectTo: `${window.location.origin}${redirectPath}`,
     })
 
     if (error) {
-      setError(error.message)
+      if (error.message === 'An unexpected error occurred during OAuth initialization') {
+        setError('OAuth no se pudo iniciar. Usa HTTPS o abre la app en localhost.')
+      } else {
+        setError(error.message)
+      }
       setLoading(false)
     }
   }
