@@ -73,22 +73,22 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ## Puesta en marcha (local)
 1. Instalar dependencias:
 ```bash
-npm install
+pnpm install
 ```
 
 2. Levantar en desarrollo:
 ```bash
-npm run dev
+pnpm dev
 ```
 
 3. Abrir:
 `http://localhost:3000`
 
-## Scripts npm
-- `npm run dev` desarrollo
-- `npm run build` build produccion
-- `npm run start` ejecutar build
-- `npm run lint` lint del proyecto
+## Scripts (pnpm)
+- `pnpm dev` desarrollo
+- `pnpm build` build produccion
+- `pnpm start` ejecutar build
+- `pnpm lint` lint del proyecto
 
 ## Bootstrap y migraciones SQL
 Scripts disponibles en `sql/`:
@@ -99,9 +99,9 @@ Scripts disponibles en `sql/`:
 Ejemplo de ejecucion:
 
 ```bash
-npx @insforge/cli db query -- "$(cat sql/list-sharing-realtime.sql)"
-npx @insforge/cli db query -- "$(cat sql/fix-products-rls.sql)"
-npx @insforge/cli db query -- "$(cat sql/improve-activity-audit.sql)"
+pnpm dlx @insforge/cli db query -- "$(cat sql/list-sharing-realtime.sql)"
+pnpm dlx @insforge/cli db query -- "$(cat sql/fix-products-rls.sql)"
+pnpm dlx @insforge/cli db query -- "$(cat sql/improve-activity-audit.sql)"
 ```
 
 ## Realtime y colaboracion
