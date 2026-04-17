@@ -89,6 +89,28 @@ pnpm dev
 - `pnpm build` build produccion
 - `pnpm start` ejecutar build
 - `pnpm lint` lint del proyecto
+- `pnpm cap:add:android` crea proyecto nativo Android (Capacitor)
+- `pnpm cap:sync:android` sincroniza cambios de config/assets a Android
+- `pnpm cap:open:android` abre el proyecto en Android Studio
+- `pnpm apk:debug` genera APK debug (`android/app/build/outputs/apk/debug`)
+- `pnpm apk:release` genera APK release (requiere firma)
+- `pnpm aab:release` genera AAB release para Play Store (requiere firma)
+
+## Android (Capacitor)
+La app Next.js se empaqueta como app Android usando un contenedor nativo con WebView.
+
+Configuracion actual:
+- `capacitor.config.ts` apunta a `https://cestapp.insforge.site`
+- La app movil carga la version publicada (no `output: 'export'`)
+
+Requisitos locales para compilar:
+- Android Studio + Android SDK
+- Java 21 (Capacitor 8 genera Android con `sourceCompatibility`/`targetCompatibility` en 21)
+
+Flujo rapido:
+1. `pnpm cap:sync:android`
+2. `pnpm apk:debug` (o abrir Android Studio con `pnpm cap:open:android`)
+3. Para Play Store: `pnpm aab:release` y firmar release en Android Studio/Gradle
 
 ## Bootstrap y migraciones SQL
 Scripts disponibles en `sql/`:
