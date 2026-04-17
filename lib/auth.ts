@@ -1,5 +1,5 @@
 import { createClient } from '@insforge/sdk'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 
 const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_URL!
 const anonKey = process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!
@@ -22,6 +22,19 @@ export function createServerClient(accessToken?: string) {
     isServerMode: true,
     edgeFunctionToken: accessToken
   })
+}
+
+async function getServerAppOrigin() {
+  const headerStore = await headers()
+  const host = headerStore.get('x-forwarded-host') ?? headerStore.get('host')
+  const proto =
+    headerStore.get('x-forwarded-proto') ?? (process.env.NODE_ENV === 'production' ? 'https' : 'http')
+
+  if (host) {
+    return `${proto}://${host}`
+  }
+
+  return process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 }
 
 export async function setAuthCookies(accessToken: string, refreshToken: string) {
@@ -72,11 +85,12 @@ export async function signIn(formData: FormData) {
 
 export async function signUp(formData: FormData) {
   const insforge = createServerClient()
+  const redirectTo = new URL('/sign-in', await getServerAppOrigin()).toString()
   const { data, error } = await insforge.auth.signUp({
     email: String(formData.get('email') ?? '').trim(),
     password: String(formData.get('password') ?? ''),
     name: String(formData.get('name') ?? '').trim(),
-    redirectTo: '/sign-in'
+    redirectTo
   })
 
   if (error) {

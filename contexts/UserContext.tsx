@@ -34,6 +34,14 @@ type UserContextType = {
 
 const UserContext = createContext<UserContextType | null>(null)
 
+function getAppOrigin() {
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return window.location.origin
+  }
+
+  return process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+}
+
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -75,11 +83,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   async function signUp(email: string, password: string, name: string) {
+    const redirectTo = new URL('/sign-in', getAppOrigin()).toString()
     const { data, error } = await insforge.auth.signUp({
       email,
       password,
       name,
-      redirectTo: '/sign-in'
+      redirectTo
     })
     if (error) return { error: error.message }
     if (data?.requireEmailVerification) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, ReactNode } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useUser } from '@/contexts/UserContext'
@@ -63,6 +63,12 @@ type RealtimePayload = {
   }
 }
 
+type ListChangedRealtimePayload = RealtimePayload & {
+  user_id?: string
+}
+
+type DashboardTab = 'products' | 'settings' | 'stats'
+
 const inputClassName =
   'w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5'
 
@@ -80,7 +86,7 @@ export default function ListDetailPage() {
   const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '' })
   const [creatingProduct, setCreatingProduct] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<'products' | 'settings' | 'stats'>('products')
+  const [activeTab, setActiveTab] = useState<DashboardTab>('products')
   const [listNameDraft, setListNameDraft] = useState('')
   const [savingListName, setSavingListName] = useState(false)
   const [shareEmail, setShareEmail] = useState('')
@@ -91,6 +97,7 @@ export default function ListDetailPage() {
   const [revokingInviteId, setRevokingInviteId] = useState<string | null>(null)
   const [copiedLinkToken, setCopiedLinkToken] = useState<string | null>(null)
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null)
+  const [updatingItems, setUpdatingItems] = useState<Set<string>>(new Set())
 
   const listChannel = `list:${listId}`
   const canManageMembers = list?.owner_id === user?.id
@@ -264,8 +271,10 @@ export default function ListDetailPage() {
   useEffect(() => {
     if (!user || !listId) return
 
-    const listUpdatesHandler = (payload: RealtimePayload) => {
-      if (payload.meta?.channel === listChannel && payload.meta?.senderId !== user.id) {
+    const listUpdatesHandler = (payload: ListChangedRealtimePayload) => {
+      // Deduplicación robusta: meta.senderId del SDK o user_id de nuestro payload
+      const isOwnEvent = payload.meta?.senderId === user.id || payload.user_id === user.id
+      if (payload.meta?.channel === listChannel && !isOwnEvent) {
         void loadData()
       }
     }
@@ -544,24 +553,58 @@ export default function ListDetailPage() {
   }
 
   async function toggleChecked(item: ListItem) {
+    const nextValue = !item.checked
+    const previousChecked = item.checked
+
+    // Optimistic update
+    setItems(current => current.map(i => i.id === item.id ? { ...i, checked: nextValue } : i))
+    setUpdatingItems(prev => new Set(prev).add(item.id))
     setError('')
+
     const { error } = await insforge.database
       .from('shopping_list_items')
-      .update({ checked: !item.checked })
+      .update({ checked: nextValue })
       .eq('id', item.id)
 
     if (error) {
-      setError(error.message)
+      setItems(current => current.map(i => i.id === item.id ? { ...i, checked: previousChecked } : i))
+      setError(`Error al marcar item: ${error.message}`)
+      setUpdatingItems(prev => {
+        const next = new Set(prev)
+        next.delete(item.id)
+        return next
+      })
       return
     }
 
-    await publishListEvent('list_changed', { action: 'item_checked', item_id: item.id })
-    await loadData()
+    try {
+      await publishListEvent('list_changed', { action: 'item_checked', item_id: item.id })
+    } catch {
+      setError('Se guardó el cambio, pero no se pudo notificar en tiempo real.')
+    } finally {
+      setUpdatingItems(prev => {
+        const next = new Set(prev)
+        next.delete(item.id)
+        return next
+      })
+    }
   }
 
   async function updateQuantity(item: ListItem, delta: number) {
-    setError('')
     const newQuantity = item.quantity + delta
+    const previousIndex = items.findIndex((i) => i.id === item.id)
+
+    if (newQuantity < 1) {
+      // Optimistic delete
+      setItems(current => current.filter(i => i.id !== item.id))
+    } else {
+      // Optimistic update
+      setItems(current => current.map(i => i.id === item.id ? { ...i, quantity: newQuantity } : i))
+    }
+    
+    setUpdatingItems(prev => new Set(prev).add(item.id))
+    setError('')
+
     const { error } =
       newQuantity < 1
         ? await insforge.database.from('shopping_list_items').delete().eq('id', item.id)
@@ -571,23 +614,82 @@ export default function ListDetailPage() {
             .eq('id', item.id)
 
     if (error) {
-      setError(error.message)
+      setItems(current => {
+        if (newQuantity < 1) {
+          const alreadyPresent = current.some((i) => i.id === item.id)
+          if (alreadyPresent) return current
+          const next = [...current]
+          const insertAt = previousIndex >= 0 ? Math.min(previousIndex, next.length) : next.length
+          next.splice(insertAt, 0, item)
+          return next
+        }
+
+        return current.map((i) => (i.id === item.id ? { ...i, quantity: item.quantity } : i))
+      })
+      setError(`Error al actualizar cantidad: ${error.message}`)
+      setUpdatingItems(prev => {
+        const next = new Set(prev)
+        next.delete(item.id)
+        return next
+      })
       return
     }
 
-    await publishListEvent('list_changed', { action: 'item_quantity', item_id: item.id })
-    await loadData()
+    try {
+      await publishListEvent('list_changed', { action: 'item_quantity', item_id: item.id })
+    } catch {
+      setError('Se guardó el cambio, pero no se pudo notificar en tiempo real.')
+    } finally {
+      setUpdatingItems(prev => {
+        const next = new Set(prev)
+        next.delete(item.id)
+        return next
+      })
+    }
   }
 
   async function removeItem(itemId: string) {
+    const previousItem = items.find((item) => item.id === itemId)
+    const previousIndex = items.findIndex((item) => item.id === itemId)
+
+    // Optimistic delete
+    setItems(current => current.filter(i => i.id !== itemId))
+    setUpdatingItems(prev => new Set(prev).add(itemId))
     setError('')
+
     const { error } = await insforge.database.from('shopping_list_items').delete().eq('id', itemId)
+    
     if (error) {
-      setError(error.message)
+      if (previousItem) {
+        setItems(current => {
+          const alreadyPresent = current.some((item) => item.id === itemId)
+          if (alreadyPresent) return current
+          const next = [...current]
+          const insertAt = previousIndex >= 0 ? Math.min(previousIndex, next.length) : next.length
+          next.splice(insertAt, 0, previousItem)
+          return next
+        })
+      }
+      setError(`Error al eliminar item: ${error.message}`)
+      setUpdatingItems(prev => {
+        const next = new Set(prev)
+        next.delete(itemId)
+        return next
+      })
       return
     }
-    await publishListEvent('list_changed', { action: 'item_removed', item_id: itemId })
-    await loadData()
+
+    try {
+      await publishListEvent('list_changed', { action: 'item_removed', item_id: itemId })
+    } catch {
+      setError('Se guardó el cambio, pero no se pudo notificar en tiempo real.')
+    } finally {
+      setUpdatingItems(prev => {
+        const next = new Set(prev)
+        next.delete(itemId)
+        return next
+      })
+    }
   }
 
   async function deleteList() {
@@ -665,14 +767,14 @@ export default function ListDetailPage() {
           </div>
 
           <div className="flex w-full items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-md overflow-x-auto sm:overflow-x-visible">
-            {[
+            {([
               { id: 'products', label: 'Productos', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25-2.25M12 13.875V7.5M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg> },
               { id: 'settings', label: 'Gestión', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg> },
               { id: 'stats', label: 'Estadísticas', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" /><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" /></svg> },
-            ].map((tab) => (
+            ] as { id: DashboardTab; label: string; icon: ReactNode }[]).map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all ${
                   activeTab === tab.id
                     ? 'bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-lg shadow-[#fb923c]/20'
@@ -734,7 +836,8 @@ export default function ListDetailPage() {
                           <div className="flex items-center gap-4 flex-1">
                             <button
                               onClick={() => toggleChecked(item)}
-                              className="group/check relative flex h-7 w-7 items-center justify-center rounded-xl border-2 border-white/10 bg-white/5 text-transparent transition-all hover:border-[#fb923c]/50 active:scale-90"
+                              disabled={updatingItems.has(item.id)}
+                              className={`group/check relative flex h-7 w-7 items-center justify-center rounded-xl border-2 border-white/10 bg-white/5 text-transparent transition-all hover:border-[#fb923c]/50 active:scale-90 ${updatingItems.has(item.id) ? 'opacity-50 cursor-wait' : ''}`}
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="currentColor" className="w-4 h-4 group-hover/check:text-[#fb923c]/20">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -749,9 +852,10 @@ export default function ListDetailPage() {
                           </div>
                           
                           <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-1.5 rounded-xl border border-white/5 bg-white/5 p-1 ring-1 ring-white/5">
+                            <div className={`flex items-center gap-1.5 rounded-xl border border-white/5 bg-white/5 p-1 ring-1 ring-white/5 ${updatingItems.has(item.id) ? 'opacity-50 pointer-events-none' : ''}`}>
                               <button
                                 onClick={() => updateQuantity(item, -1)}
+                                disabled={updatingItems.has(item.id)}
                                 className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 transition-all"
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3">
@@ -761,6 +865,7 @@ export default function ListDetailPage() {
                               <span className="w-6 text-center text-xs font-bold text-white">{item.quantity}</span>
                               <button
                                 onClick={() => updateQuantity(item, 1)}
+                                disabled={updatingItems.has(item.id)}
                                 className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-emerald-500/20 hover:text-emerald-400 transition-all"
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3">
@@ -770,7 +875,8 @@ export default function ListDetailPage() {
                             </div>
                             <button
                               onClick={() => removeItem(item.id)}
-                              className="hidden group-hover:flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-rose-500/10 hover:text-rose-500 transition-all"
+                              disabled={updatingItems.has(item.id)}
+                              className="hidden group-hover:flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-rose-500/10 hover:text-rose-500 transition-all disabled:opacity-30"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -795,7 +901,8 @@ export default function ListDetailPage() {
                           <div className="flex items-center gap-4 flex-1">
                             <button
                               onClick={() => toggleChecked(item)}
-                              className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-90"
+                              disabled={updatingItems.has(item.id)}
+                              className={`flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-90 ${updatingItems.has(item.id) ? 'opacity-50 cursor-wait' : ''}`}
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
