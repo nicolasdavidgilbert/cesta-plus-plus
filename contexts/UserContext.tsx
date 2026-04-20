@@ -40,6 +40,16 @@ const ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 15
 const REFRESH_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
 const SESSION_REFRESH_INTERVAL_MS = 8 * 60 * 1000
 
+type RefreshResult =
+  | { ok: true }
+  | { ok: false; reason: 'auth' | 'transient' }
+
+type ErrorLike = {
+  statusCode?: unknown
+  error?: unknown
+  message?: unknown
+}
+
 function getAppOrigin() {
   if (typeof window !== 'undefined' && window.location.origin) {
     return window.location.origin
@@ -94,6 +104,26 @@ function redirectToLogin() {
   params.set('redirect', redirect)
   params.set('session_expired', '1')
   window.location.replace(`/sign-in?${params.toString()}`)
+}
+
+function isAuthSessionError(error: unknown) {
+  const details = (error ?? {}) as ErrorLike
+  const statusCode = typeof details.statusCode === 'number' ? details.statusCode : null
+  const errorCode = typeof details.error === 'string' ? details.error.toUpperCase() : ''
+  const errorMessage = (() => {
+    if (typeof details.message === 'string') return details.message.toLowerCase()
+    if (error instanceof Error && typeof error.message === 'string') return error.message.toLowerCase()
+    return ''
+  })()
+
+  if (statusCode === 401 || statusCode === 403) return true
+  if (errorCode === 'INVALID_TOKEN' || errorCode === 'UNAUTHORIZED' || errorCode === 'TOKEN_EXPIRED') return true
+  if (errorMessage.includes('sesión no válida') || errorMessage.includes('session invalid')) return true
+  if (errorMessage.includes('unauthorized') || errorMessage.includes('invalid token')) return true
+  if (errorMessage.includes('refresh token') && errorMessage.includes('invalid')) return true
+  if (errorMessage.includes('token expired')) return true
+
+  return false
 }
 
 export function UserProvider({ children }: { children: ReactNode }) {
@@ -154,7 +184,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }, [clearTokenCookies])
 
-  const refreshSession = useCallback(async () => {
+  const refreshSession = useCallback(async (): Promise<RefreshResult> => {
     try {
       const refreshResponse = await insforge.getHttpClient().handleTokenRefresh()
       persistTokens(
@@ -166,10 +196,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
         setUser(normalizeUser(refreshResponse.user))
       }
 
-      return true
-    } catch {
-      await handleRefreshFailure()
-      return false
+      return { ok: true }
+    } catch (error) {
+      if (isAuthSessionError(error)) {
+        await handleRefreshFailure()
+        return { ok: false, reason: 'auth' }
+      }
+
+      return { ok: false, reason: 'transient' }
     }
   }, [handleRefreshFailure, persistTokens])
 
@@ -186,8 +220,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
 
     if (error) {
+      if (isAuthSessionError(error)) {
+        await handleRefreshFailure()
+        setLoading(false)
+        return
+      }
+
       const refreshed = await refreshSession()
-      if (!refreshed) {
+      if (!refreshed.ok) {
+        if (refreshed.reason === 'transient') {
+          const { data: retryData, error: retryError } = await insforge.auth.getCurrentUser()
+          if (!retryError && retryData?.user) {
+            setUser(normalizeUser(retryData.user))
+          }
+        }
         setLoading(false)
         return
       }
@@ -203,7 +249,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
 
     setLoading(false)
-  }, [hydrateTokensFromCookies, refreshSession])
+  }, [handleRefreshFailure, hydrateTokensFromCookies, refreshSession])
 
   useEffect(() => {
     queueMicrotask(() => {
