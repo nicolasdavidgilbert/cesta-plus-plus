@@ -1093,8 +1093,8 @@ export default function ListDetailPage() {
 
       {/* Modern Add Product Modal */}
       {showAddProduct && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 sm:p-6">
-          <div className="w-full max-w-2xl max-h-[90vh] flex flex-col rounded-[2.5rem] border border-white/10 bg-slate-900 shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-0 sm:p-6">
+          <div className="w-full max-w-2xl h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-[2.5rem] border border-white/10 bg-slate-900 shadow-2xl overflow-hidden">
             <div className="p-8 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
               <div className="space-y-1">
                 <h3 className="text-2xl font-bold text-white tracking-tight">Gestionar Productos</h3>
