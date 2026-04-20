@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useUser } from '@/contexts/UserContext'
@@ -8,25 +8,47 @@ import { insforge } from '@/lib/insforge'
 import { AuthLayout } from '@/components/auth/AuthLayout'
 import { PremiumInput } from '@/components/auth/PremiumInput'
 
+type SignInQueryState = {
+  authStatus: string | null
+  authType: string | null
+  authError: string | null
+  sessionExpired: boolean
+  redirectPath: string
+}
+
 export default function SignInPage() {
   const router = useRouter()
   const { signIn } = useUser()
-  const initialSearchParams =
-    typeof window === 'undefined' ? null : new URLSearchParams(window.location.search)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [authStatus] = useState<string | null>(
-    initialSearchParams?.get('insforge_status') ?? null
-  )
-  const [authType] = useState<string | null>(initialSearchParams?.get('insforge_type') ?? null)
-  const [authError] = useState<string | null>(initialSearchParams?.get('insforge_error') ?? null)
-  const [sessionExpired] = useState<boolean>(initialSearchParams?.get('session_expired') === '1')
-  const [redirectPath] = useState<string>(() => {
-    const redirect = initialSearchParams?.get('redirect') ?? ''
-    return redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard'
+  const [queryState, setQueryState] = useState<SignInQueryState>({
+    authStatus: null,
+    authType: null,
+    authError: null,
+    sessionExpired: false,
+    redirectPath: '/dashboard',
   })
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      const params = new URLSearchParams(window.location.search)
+      const redirect = params.get('redirect') ?? ''
+      const nextRedirectPath =
+        redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard'
+
+      setQueryState({
+        authStatus: params.get('insforge_status'),
+        authType: params.get('insforge_type'),
+        authError: params.get('insforge_error'),
+        sessionExpired: params.get('session_expired') === '1',
+        redirectPath: nextRedirectPath,
+      })
+    })
+  }, [])
+
+  const { authStatus, authType, authError, sessionExpired, redirectPath } = queryState
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
