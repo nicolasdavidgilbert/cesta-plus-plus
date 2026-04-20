@@ -461,19 +461,30 @@ export default function ProductsPage() {
               </div>
             </div>
 
-            <div className="group relative">
-              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-500 group-focus-within:text-[#fb923c] transition-colors">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                </svg>
+            <div className="flex items-center gap-4">
+              <div className="group relative flex-1">
+                <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-500 group-focus-within:text-[#fb923c] transition-colors">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                  </svg>
+                </div>
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Busca por nombre o descripción..."
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 py-4 pl-14 pr-6 text-sm text-white placeholder-slate-500 outline-none backdrop-blur-md transition-all focus:border-[#fb923c]/50 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/10"
+                />
               </div>
-              <input
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Busca por nombre o descripción..."
-                className="w-full rounded-2xl border border-white/10 bg-white/5 py-4 pl-14 pr-6 text-sm text-white placeholder-slate-500 outline-none backdrop-blur-md transition-all focus:border-[#fb923c]/50 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/10"
-              />
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(true)}
+                className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-105 active:scale-95"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+              </button>
             </div>
           </header>
 
@@ -562,7 +573,7 @@ export default function ProductsPage() {
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="fixed bottom-28 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-xl shadow-[#fb923c]/40 transition-all hover:scale-110 active:scale-90"
+            className="fixed bottom-28 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-xl shadow-[#fb923c]/40 transition-all hover:scale-110 active:scale-90 sm:hidden"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
