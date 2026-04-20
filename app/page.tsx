@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { MeshBackground } from '@/components/auth/MeshBackground'
 
 const benefits = [
@@ -48,6 +50,29 @@ const previewList = [
 ]
 
 export default function HomePage() {
+  const router = useRouter()
+
+  useEffect(() => {
+    const isStandaloneDisplayMode =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(display-mode: standalone)').matches
+
+    const isIOSStandalone =
+      'standalone' in window.navigator &&
+      Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone)
+
+    const capacitor = (window as Window & {
+      Capacitor?: { isNativePlatform?: () => boolean }
+    }).Capacitor
+
+    const isCapacitor = Boolean(capacitor?.isNativePlatform?.() ?? capacitor)
+    const isAppEnvironment = isStandaloneDisplayMode || isIOSStandalone || isCapacitor
+
+    if (isAppEnvironment) {
+      router.replace('/dashboard')
+    }
+  }, [router])
+
   return (
     <div className="relative min-h-screen text-slate-200 selection:bg-[#fb923c]/30 selection:text-white">
       <MeshBackground />
