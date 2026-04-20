@@ -1,8 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Capacitor } from '@capacitor/core'
+import { App as CapacitorApp } from '@capacitor/app'
+import { Browser } from '@capacitor/browser'
 import { useUser } from '@/contexts/UserContext'
 import { insforge } from '@/lib/insforge'
 import { AuthLayout } from '@/components/auth/AuthLayout'
@@ -16,9 +19,26 @@ type SignInQueryState = {
   redirectPath: string
 }
 
+const CAPACITOR_APP_SCHEME = 'site.insforge.cestapp'
+const OAUTH_REDIRECT_PATH_KEY = 'oauth_redirect_path'
+const OAUTH_CODE_VERIFIER_KEY = 'oauth_code_verifier'
+
+function sanitizeRedirectPath(path: string | null | undefined) {
+  const value = path ?? ''
+  return value.startsWith('/') && !value.startsWith('//') ? value : '/dashboard'
+}
+
+function isNativeCapacitorApp() {
+  try {
+    return Capacitor.isNativePlatform()
+  } catch {
+    return false
+  }
+}
+
 export default function SignInPage() {
   const router = useRouter()
-  const { signIn } = useUser()
+  const { signIn, refreshUser } = useUser()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -30,13 +50,12 @@ export default function SignInPage() {
     sessionExpired: false,
     redirectPath: '/dashboard',
   })
+  const processingOAuthRef = useRef(false)
 
   useEffect(() => {
     queueMicrotask(() => {
       const params = new URLSearchParams(window.location.search)
-      const redirect = params.get('redirect') ?? ''
-      const nextRedirectPath =
-        redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard'
+      const nextRedirectPath = sanitizeRedirectPath(params.get('redirect'))
 
       setQueryState({
         authStatus: params.get('insforge_status'),
@@ -49,6 +68,92 @@ export default function SignInPage() {
   }, [])
 
   const { authStatus, authType, authError, sessionExpired, redirectPath } = queryState
+
+  const handleNativeOAuthCallback = useCallback(
+    async (url: string) => {
+      if (processingOAuthRef.current) return
+
+      let incomingUrl: URL
+      try {
+        incomingUrl = new URL(url)
+      } catch {
+        return
+      }
+
+      const expectedProtocol = `${CAPACITOR_APP_SCHEME}:`
+      const isExpectedCallbackLocation =
+        incomingUrl.hostname === 'oauth-callback' || incomingUrl.pathname === '/oauth-callback'
+
+      if (incomingUrl.protocol !== expectedProtocol || !isExpectedCallbackLocation) {
+        return
+      }
+
+      const oauthCode = incomingUrl.searchParams.get('insforge_code') ?? incomingUrl.searchParams.get('code')
+      const callbackError = incomingUrl.searchParams.get('insforge_error')
+      const codeVerifier =
+        sessionStorage.getItem(OAUTH_CODE_VERIFIER_KEY) ?? localStorage.getItem(OAUTH_CODE_VERIFIER_KEY)
+      const nextRedirect = sanitizeRedirectPath(
+        incomingUrl.searchParams.get('redirect') ?? sessionStorage.getItem(OAUTH_REDIRECT_PATH_KEY) ?? redirectPath
+      )
+
+      if (!oauthCode) {
+        if (callbackError) {
+          setError(callbackError)
+        }
+        void Browser.close()
+        return
+      }
+
+      processingOAuthRef.current = true
+      setError('')
+      setLoading(true)
+
+      const { error: exchangeError } = await insforge.auth.exchangeOAuthCode(oauthCode, codeVerifier ?? undefined)
+
+      if (exchangeError) {
+        setError(exchangeError.message)
+        setLoading(false)
+        processingOAuthRef.current = false
+        return
+      }
+
+      sessionStorage.removeItem(OAUTH_REDIRECT_PATH_KEY)
+      sessionStorage.removeItem(OAUTH_CODE_VERIFIER_KEY)
+      localStorage.removeItem(OAUTH_CODE_VERIFIER_KEY)
+      await refreshUser()
+      void Browser.close()
+      router.replace(nextRedirect)
+    },
+    [redirectPath, refreshUser, router]
+  )
+
+  useEffect(() => {
+    if (!isNativeCapacitorApp()) return
+
+    let removeListener: (() => Promise<void>) | null = null
+
+    queueMicrotask(async () => {
+      try {
+        const launchData = await CapacitorApp.getLaunchUrl()
+        if (launchData?.url) {
+          await handleNativeOAuthCallback(launchData.url)
+        }
+
+        const listener = await CapacitorApp.addListener('appUrlOpen', (event) => {
+          void handleNativeOAuthCallback(event.url)
+        })
+        removeListener = listener.remove
+      } catch {
+        // Ignore listener registration failures on non-native environments.
+      }
+    })
+
+    return () => {
+      if (removeListener) {
+        void removeListener()
+      }
+    }
+  }, [handleNativeOAuthCallback])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -68,19 +173,36 @@ export default function SignInPage() {
     setError('')
     setLoading(true)
 
+    const isNativeApp = isNativeCapacitorApp()
     const hostname = window.location.hostname
     const isLocalhost =
       hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]'
-    if (!window.isSecureContext && !isLocalhost) {
+    if (!isNativeApp && !window.isSecureContext && !isLocalhost) {
       setError('Google OAuth require HTTPS si no usas localhost.')
       setLoading(false)
       return
     }
 
-    const { error } = await insforge.auth.signInWithOAuth({
-      provider,
-      redirectTo: `${window.location.origin}${redirectPath}`,
-    })
+    const redirectTo = isNativeApp
+      ? `${CAPACITOR_APP_SCHEME}://oauth-callback`
+      : `${window.location.origin}${redirectPath}`
+
+    if (isNativeApp) {
+      sessionStorage.setItem(OAUTH_REDIRECT_PATH_KEY, redirectPath)
+    }
+
+    const { data, error } = await insforge.auth.signInWithOAuth(
+      isNativeApp
+        ? {
+            provider,
+            redirectTo,
+            skipBrowserRedirect: true,
+          }
+        : {
+            provider,
+            redirectTo,
+          }
+    )
 
     if (error) {
       if (error.message === 'An unexpected error occurred during OAuth initialization') {
@@ -89,6 +211,26 @@ export default function SignInPage() {
         setError(error.message)
       }
       setLoading(false)
+      return
+    }
+
+    if (isNativeApp) {
+      if (data?.codeVerifier) {
+        sessionStorage.setItem(OAUTH_CODE_VERIFIER_KEY, data.codeVerifier)
+        localStorage.setItem(OAUTH_CODE_VERIFIER_KEY, data.codeVerifier)
+      }
+
+      if (data?.url) {
+        try {
+          await Browser.open({ url: data.url })
+        } catch {
+          setError('No se pudo abrir Google OAuth en el navegador del sistema.')
+          setLoading(false)
+        }
+      } else {
+        setError('No se pudo abrir Google OAuth en la app.')
+        setLoading(false)
+      }
     }
   }
 

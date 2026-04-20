@@ -126,8 +126,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const accessToken = readCookie(ACCESS_TOKEN_COOKIE)
     const refreshToken = readCookie(REFRESH_TOKEN_COOKIE)
 
-    insforge.getHttpClient().setAuthToken(accessToken)
-    insforge.getHttpClient().setRefreshToken(refreshToken)
+    // Do not clobber an in-memory OAuth session with null when cookies are not yet written.
+    if (accessToken) {
+      insforge.getHttpClient().setAuthToken(accessToken)
+    }
+    if (refreshToken) {
+      insforge.getHttpClient().setRefreshToken(refreshToken)
+    }
 
     return { accessToken, refreshToken }
   }, [])
