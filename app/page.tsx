@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { MeshBackground } from '@/components/auth/MeshBackground'
@@ -51,6 +51,7 @@ const previewList = [
 
 export default function HomePage() {
   const router = useRouter()
+  const [canRenderLanding, setCanRenderLanding] = useState(false)
 
   useEffect(() => {
     const isStandaloneDisplayMode =
@@ -70,8 +71,17 @@ export default function HomePage() {
 
     if (isAppEnvironment) {
       router.replace('/dashboard')
+      return
     }
+
+    queueMicrotask(() => {
+      setCanRenderLanding(true)
+    })
   }, [router])
+
+  if (!canRenderLanding) {
+    return null
+  }
 
   return (
     <div className="relative min-h-screen text-slate-200 selection:bg-[#fb923c]/30 selection:text-white">
