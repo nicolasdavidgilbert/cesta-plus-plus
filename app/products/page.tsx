@@ -103,8 +103,10 @@ export default function ProductsPage() {
   const { user, loading: authLoading, refreshUser } = useUser()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
   const [newProduct, setNewProduct] = useState({ title: '', description: '', price: '' })
   const [creating, setCreating] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [showEditor, setShowEditor] = useState(false)
   const [editorForm, setEditorForm] = useState({ title: '', description: '' })
@@ -246,8 +248,13 @@ export default function ProductsPage() {
       ])
     }
 
-    setProducts([data, ...products])
+    setProducts((previous) => {
+      const nextProducts = [data, ...previous]
+      writeCachedProducts(user.id, nextProducts)
+      return nextProducts
+    })
     setNewProduct({ title: '', description: '', price: '' })
+    setShowCreateModal(false)
     setCreating(false)
   }
 
@@ -409,6 +416,15 @@ export default function ProductsPage() {
     setNewHistoryPrice('')
   }
 
+  const normalizedSearch = search.trim().toLowerCase()
+  const filteredProducts = normalizedSearch
+    ? products.filter((product) => {
+        const title = product.title.toLowerCase()
+        const description = product.description?.toLowerCase() ?? ''
+        return title.includes(normalizedSearch) || description.includes(normalizedSearch)
+      })
+    : products
+
   if (authLoading || !user) {
     return (
       <main className="flex min-h-screen items-center justify-center p-6">
@@ -424,65 +440,42 @@ export default function ProductsPage() {
     <>
       <main className="min-h-screen w-full px-4 sm:px-6 py-12 pb-40">
         <div className="mx-auto w-full max-w-6xl space-y-12">
-          <header className="flex flex-wrap items-start justify-between gap-6">
-            <div className="space-y-4">
-              <Link
-                href="/dashboard"
-                className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-all hover:bg-white/10 hover:text-white"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 transition-transform group-hover:-translate-x-1">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                </svg>
-                Volver a Listas
-              </Link>
-              <div className="space-y-1">
-                <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
-                  Catálogo Maestro
-                </h1>
-                <p className="text-sm text-slate-500 font-medium tracking-tight">Gestiona productos, descripciones y haz seguimiento histórico de precios.</p>
+          <header className="space-y-6">
+            <div className="flex flex-wrap items-start justify-between gap-6">
+              <div className="space-y-4">
+                <Link
+                  href="/dashboard"
+                  className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-all hover:bg-white/10 hover:text-white"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 transition-transform group-hover:-translate-x-1">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                  </svg>
+                  Volver a Listas
+                </Link>
+                <div className="space-y-1">
+                  <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+                    Catálogo Maestro
+                  </h1>
+                  <p className="text-sm text-slate-500 font-medium tracking-tight">Gestiona productos, descripciones y haz seguimiento histórico de precios.</p>
+                </div>
               </div>
             </div>
-          </header>
 
-          <section className="rounded-3xl sm:rounded-[2.5rem] border border-white/10 bg-white/5 p-6 sm:p-10 backdrop-blur-md">
-            <div className="space-y-6">
-              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Alta de Producto</span>
-              <form onSubmit={createProduct} className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <input
-                  type="text"
-                  value={newProduct.title}
-                  onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
-                  placeholder="Nombre del producto *"
-                  className={inputClassName}
-                  required
-                />
-                <input
-                  type="text"
-                  value={newProduct.description}
-                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                  placeholder="Descripción"
-                  className={inputClassName}
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={newProduct.price}
-                  onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-                  placeholder="Precio inicial (EUR)"
-                  className={inputClassName}
-                />
-                <button
-                  type="submit"
-                  disabled={creating || !newProduct.title.trim()}
-                  className="group relative flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-6 py-4 text-sm font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
-                >
-                  <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
-                  {creating ? 'Creando...' : 'Añadir Producto'}
-                </button>
-              </form>
+            <div className="group relative">
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-500 group-focus-within:text-[#fb923c] transition-colors">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+              </div>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Busca por nombre o descripción..."
+                className="w-full rounded-2xl border border-white/10 bg-white/5 py-4 pl-14 pr-6 text-sm text-white placeholder-slate-500 outline-none backdrop-blur-md transition-all focus:border-[#fb923c]/50 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/10"
+              />
             </div>
-          </section>
+          </header>
 
           {error && (
             <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-6 py-4 text-sm font-medium text-rose-400 backdrop-blur-md">
@@ -496,7 +489,7 @@ export default function ProductsPage() {
                 <div key={i} className="h-40 animate-pulse rounded-3xl border border-white/5 bg-white/5" />
               ))}
             </div>
-          ) : products.length === 0 ? (
+          ) : filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center space-y-6">
               <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-white/5 text-slate-600 ring-1 ring-white/10">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12">
@@ -504,13 +497,28 @@ export default function ProductsPage() {
                 </svg>
               </div>
               <div className="space-y-2">
-                <h2 className="text-xl font-bold text-white tracking-tight">Catálogo sin ítems</h2>
-                <p className="text-slate-500 text-sm max-w-xs mx-auto">Tus productos creados aparecerán aquí para ser reutilizados en cualquier lista.</p>
+                <h2 className="text-xl font-bold text-white tracking-tight">
+                  {products.length === 0 ? 'Catálogo sin ítems' : 'Sin resultados'}
+                </h2>
+                <p className="text-slate-500 text-sm max-w-xs mx-auto">
+                  {products.length === 0
+                    ? 'Tus productos creados aparecerán aquí para ser reutilizados en cualquier lista.'
+                    : 'Prueba con otros términos de búsqueda.'}
+                </p>
               </div>
+              {products.length === 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(true)}
+                  className="inline-flex items-center justify-center rounded-xl bg-white/5 px-6 py-3 text-sm font-bold text-white ring-1 ring-white/10 transition-all hover:bg-white/10 active:scale-95"
+                >
+                  Crear mi primer producto
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <button
                   type="button"
                   key={product.id}
@@ -549,6 +557,88 @@ export default function ProductsPage() {
             </div>
           )}
         </div>
+
+        {!showCreateModal && (
+          <button
+            type="button"
+            onClick={() => setShowCreateModal(true)}
+            className="fixed bottom-28 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-xl shadow-[#fb923c]/40 transition-all hover:scale-110 active:scale-90"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </button>
+        )}
+
+        {showCreateModal && (
+          <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/80 backdrop-blur-sm p-4 sm:items-center sm:p-6">
+            <div className="w-full max-w-xl animate-in slide-in-from-bottom duration-300 rounded-[2.5rem] border border-white/20 bg-slate-900 p-8 shadow-2xl [background:linear-gradient(135deg,rgba(15,23,42,1),rgba(30,41,59,1))]">
+              <div className="mb-8 flex items-center justify-between">
+                <div className="space-y-1">
+                  <h2 className="text-2xl font-bold text-white tracking-tight">Nuevo Producto</h2>
+                  <p className="text-xs font-medium uppercase tracking-widest text-slate-500">Añade tu producto al catálogo</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => !creating && setShowCreateModal(false)}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-slate-400 transition-colors hover:text-white"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={createProduct} className="space-y-4">
+                <div className="space-y-2">
+                  <label className="ml-1 text-xs font-bold uppercase tracking-widest text-[#fb923c]">Nombre del producto</label>
+                  <input
+                    type="text"
+                    value={newProduct.title}
+                    onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
+                    placeholder="Ej: Leche semidesnatada"
+                    className={inputClassName}
+                    autoFocus
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="ml-1 text-xs font-bold uppercase tracking-widest text-[#fb923c]">Descripción</label>
+                  <input
+                    type="text"
+                    value={newProduct.description}
+                    onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                    placeholder="Marca, tamaño o notas..."
+                    className={inputClassName}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="ml-1 text-xs font-bold uppercase tracking-widest text-[#fb923c]">Precio inicial (EUR)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={newProduct.price}
+                    onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                    placeholder="0.00"
+                    className={inputClassName}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={creating || !newProduct.title.trim()}
+                  className="group relative mt-2 flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-6 py-4 text-base font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100"
+                >
+                  <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+                  {creating ? 'Creando producto...' : 'Crear producto'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
 
         {showEditor && selectedProduct && (
           <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-0 sm:p-6 lg:p-12">
