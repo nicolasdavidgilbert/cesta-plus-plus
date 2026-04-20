@@ -22,6 +22,7 @@ export default function SignInPage() {
   )
   const [authType] = useState<string | null>(initialSearchParams?.get('insforge_type') ?? null)
   const [authError] = useState<string | null>(initialSearchParams?.get('insforge_error') ?? null)
+  const [sessionExpired] = useState<boolean>(initialSearchParams?.get('session_expired') === '1')
   const [redirectPath] = useState<string>(() => {
     const redirect = initialSearchParams?.get('redirect') ?? ''
     return redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard'
@@ -77,6 +78,12 @@ export default function SignInPage() {
       <div className="space-y-6">
         {/* Status Messages */}
         <div className="space-y-3">
+          {sessionExpired && (
+            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-300 font-medium">
+              Tu sesión expiró. Inicia sesión de nuevo para continuar.
+            </div>
+          )}
+
           {authStatus === 'success' && authType === 'verify_email' && (
             <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
               Email verificado. Ya puedes iniciar sesión.

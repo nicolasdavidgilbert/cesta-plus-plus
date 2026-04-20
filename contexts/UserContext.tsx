@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { insforge } from '@/lib/insforge'
 
 type UserProfile = {
@@ -34,6 +34,12 @@ type UserContextType = {
 
 const UserContext = createContext<UserContextType | null>(null)
 
+const ACCESS_TOKEN_COOKIE = 'insforge_client_access_token'
+const REFRESH_TOKEN_COOKIE = 'insforge_client_refresh_token'
+const ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 15
+const REFRESH_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
+const SESSION_REFRESH_INTERVAL_MS = 8 * 60 * 1000
+
 function getAppOrigin() {
   if (typeof window !== 'undefined' && window.location.origin) {
     return window.location.origin
@@ -42,9 +48,58 @@ function getAppOrigin() {
   return process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 }
 
+function readCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null
+
+  const cookie = document.cookie
+    .split(';')
+    .map((item) => item.trim())
+    .find((item) => item.startsWith(`${name}=`))
+
+  if (!cookie) return null
+
+  const value = cookie.slice(name.length + 1)
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
+
+function writeCookie(name: string, value: string, maxAge: number) {
+  if (typeof document === 'undefined') return
+
+  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`
+}
+
+function deleteCookie(name: string) {
+  if (typeof document === 'undefined') return
+
+  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : ''
+  document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax${secure}`
+}
+
+function isProtectedPath(pathname: string) {
+  return pathname.startsWith('/dashboard') || pathname.startsWith('/products') || pathname.startsWith('/invite')
+}
+
+function redirectToLogin() {
+  if (typeof window === 'undefined') return
+  const pathname = window.location.pathname
+  if (pathname.startsWith('/sign-in')) return
+
+  const redirect = `${pathname}${window.location.search || ''}`
+  const params = new URLSearchParams()
+  params.set('redirect', redirect)
+  params.set('session_expired', '1')
+  window.location.replace(`/sign-in?${params.toString()}`)
+}
+
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const redirectedAfterRefreshFailureRef = useRef(false)
 
   function normalizeUser(raw: unknown): User {
     const userData = raw as User
@@ -55,17 +110,95 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const persistTokens = useCallback((accessToken?: string | null, refreshToken?: string | null) => {
+    if (accessToken) {
+      writeCookie(ACCESS_TOKEN_COOKIE, accessToken, ACCESS_TOKEN_MAX_AGE_SECONDS)
+      insforge.getHttpClient().setAuthToken(accessToken)
+    }
+
+    if (refreshToken) {
+      writeCookie(REFRESH_TOKEN_COOKIE, refreshToken, REFRESH_TOKEN_MAX_AGE_SECONDS)
+      insforge.getHttpClient().setRefreshToken(refreshToken)
+    }
+  }, [])
+
+  const hydrateTokensFromCookies = useCallback(() => {
+    const accessToken = readCookie(ACCESS_TOKEN_COOKIE)
+    const refreshToken = readCookie(REFRESH_TOKEN_COOKIE)
+
+    insforge.getHttpClient().setAuthToken(accessToken)
+    insforge.getHttpClient().setRefreshToken(refreshToken)
+
+    return { accessToken, refreshToken }
+  }, [])
+
+  const clearTokenCookies = useCallback(() => {
+    deleteCookie(ACCESS_TOKEN_COOKIE)
+    deleteCookie(REFRESH_TOKEN_COOKIE)
+    insforge.getHttpClient().setAuthToken(null)
+    insforge.getHttpClient().setRefreshToken(null)
+  }, [])
+
+  const handleRefreshFailure = useCallback(async () => {
+    clearTokenCookies()
+    setUser(null)
+
+    if (typeof window !== 'undefined' && isProtectedPath(window.location.pathname) && !redirectedAfterRefreshFailureRef.current) {
+      redirectedAfterRefreshFailureRef.current = true
+      redirectToLogin()
+    }
+  }, [clearTokenCookies])
+
+  const refreshSession = useCallback(async () => {
+    try {
+      const refreshResponse = await insforge.getHttpClient().handleTokenRefresh()
+      persistTokens(
+        refreshResponse.accessToken ?? null,
+        refreshResponse.refreshToken ?? readCookie(REFRESH_TOKEN_COOKIE)
+      )
+
+      if (refreshResponse.user) {
+        setUser(normalizeUser(refreshResponse.user))
+      }
+
+      return true
+    } catch {
+      await handleRefreshFailure()
+      return false
+    }
+  }, [handleRefreshFailure, persistTokens])
+
   const checkUser = useCallback(async () => {
+    redirectedAfterRefreshFailureRef.current = false
+    hydrateTokensFromCookies()
+
     const { data, error } = await insforge.auth.getCurrentUser()
 
     if (!error && data?.user) {
       setUser(normalizeUser(data.user))
+      setLoading(false)
+      return
+    }
+
+    if (error) {
+      const refreshed = await refreshSession()
+      if (!refreshed) {
+        setLoading(false)
+        return
+      }
+
+      const { data: refreshedUserData, error: refreshedUserError } = await insforge.auth.getCurrentUser()
+      if (!refreshedUserError && refreshedUserData?.user) {
+        setUser(normalizeUser(refreshedUserData.user))
+      } else {
+        setUser(null)
+      }
     } else {
       setUser(null)
     }
 
     setLoading(false)
-  }, [])
+  }, [hydrateTokensFromCookies, refreshSession])
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -73,10 +206,32 @@ export function UserProvider({ children }: { children: ReactNode }) {
     })
   }, [checkUser])
 
+  useEffect(() => {
+    if (!user) return
+
+    const refreshNow = () => {
+      void refreshSession()
+    }
+
+    const intervalId = window.setInterval(refreshNow, SESSION_REFRESH_INTERVAL_MS)
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshNow()
+      }
+    }
+
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      window.clearInterval(intervalId)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [user, refreshSession])
+
   async function signIn(email: string, password: string) {
     const { data, error } = await insforge.auth.signInWithPassword({ email, password })
     if (error) return { error: error.message }
     if (data?.user) {
+      persistTokens(data.accessToken ?? null, data.refreshToken ?? null)
       setUser(normalizeUser(data.user))
     }
     return {}
@@ -95,6 +250,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       return { requireVerification: true }
     }
     if (data?.user) {
+      persistTokens(data.accessToken ?? null, data.refreshToken ?? null)
       setUser(normalizeUser(data.user))
     }
     return {}
@@ -104,6 +260,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const { data, error } = await insforge.auth.verifyEmail({ email, otp: code })
     if (error) return { error: error.message }
     if (data?.user) {
+      persistTokens(data.accessToken ?? null, data.refreshToken ?? null)
       setUser(normalizeUser(data.user))
     }
     return {}
@@ -122,6 +279,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   async function signOut() {
     await insforge.auth.signOut()
+    clearTokenCookies()
     setUser(null)
   }
 
