@@ -39,8 +39,8 @@ export default function ProfilePage() {
 
   return (
     <>
-      <main className="min-h-screen w-full px-4 sm:px-6 py-12 pb-40">
-        <div className="mx-auto w-full max-w-4xl space-y-10">
+      <main className="min-h-screen w-full px-4 sm:px-6 py-10 sm:py-16 pb-40">
+        <div className="mx-auto w-full max-w-4xl space-y-12">
           <header className="space-y-4">
              <Link
                 href="/dashboard"
@@ -51,8 +51,8 @@ export default function ProfilePage() {
                 </svg>
                 Regresar
               </Link>
-            <div className="space-y-1">
-              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+            <div className="space-y-1.5 px-1">
+              <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
                 Tu Identidad
               </h1>
               <p className="text-sm text-slate-500 font-medium tracking-tight">Personaliza tu presencia y gestiona tu cuenta.</p>
@@ -61,7 +61,7 @@ export default function ProfilePage() {
 
           <div className="grid gap-8 lg:grid-cols-5">
             <div className="lg:col-span-3 space-y-8">
-              <section className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 backdrop-blur-md">
+              <section className="rounded-3xl sm:rounded-[2.5rem] border border-white/10 bg-white/5 p-6 sm:p-10 backdrop-blur-md">
                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Configuración Pública</span>
                 <ProfileForm
                   key={`${user.id}:${user.updatedAt || 'static'}`}
@@ -77,7 +77,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="lg:col-span-2 space-y-8">
-              <section className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 backdrop-blur-md space-y-8">
+              <section className="rounded-3xl sm:rounded-[2.5rem] border border-white/10 bg-white/5 p-6 sm:p-10 backdrop-blur-md space-y-8">
                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Detalles de Cuenta</span>
                 <div className="space-y-4">
                   {[
@@ -86,9 +86,9 @@ export default function ProfilePage() {
                     { label: 'Estado de Verificación', value: user.emailVerified ? 'Verificado' : 'Pendiente' },
                     { label: 'Método de Acceso', value: user.providers?.join(', ') || 'N/A' },
                   ].map((item, idx) => (
-                    <div key={idx} className="space-y-1 group">
+                    <div key={idx} className="space-y-1.5 group">
                       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">{item.label}</p>
-                      <div className="rounded-2xl border border-white/5 bg-white/5 px-5 py-3 text-sm font-medium text-slate-300 ring-1 ring-white/5 transition-all group-hover:bg-white/10 group-hover:text-white truncate">
+                      <div className="rounded-2xl border border-white/5 bg-white/5 px-5 py-3.5 text-sm font-medium text-slate-300 ring-1 ring-white/5 transition-all group-hover:bg-white/10 group-hover:text-white break-all sm:truncate">
                         {item.value}
                       </div>
                     </div>
@@ -128,7 +128,7 @@ function ProfileForm({
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const inputClassName = "w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5"
+  const inputClassName = "w-full rounded-2xl border border-white/10 bg-white/5 px-5 sm:px-6 py-3.5 sm:py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5"
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -163,8 +163,8 @@ function ProfileForm({
     <form onSubmit={handleSubmit} className="mt-8 space-y-6">
       <div className="grid gap-6">
         <div className="space-y-4">
-          <div className="flex flex-col gap-6 sm:flex-row">
-            <div className="relative group">
+          <div className="flex flex-col gap-8 sm:flex-row sm:items-center">
+            <div className="relative group flex justify-center sm:justify-start">
               <div className="h-28 w-28 rounded-3xl overflow-hidden ring-4 ring-white/5 bg-slate-800 flex items-center justify-center transition-all group-hover:ring-[#fb923c]/20">
                 {profile.avatar_url ? (
                   <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />

@@ -444,7 +444,7 @@ export default function ProductsPage() {
             </div>
           </header>
 
-          <section className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 backdrop-blur-md">
+          <section className="rounded-3xl sm:rounded-[2.5rem] border border-white/10 bg-white/5 p-6 sm:p-10 backdrop-blur-md">
             <div className="space-y-6">
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Alta de Producto</span>
               <form onSubmit={createProduct} className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -568,7 +568,7 @@ export default function ProductsPage() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-10">
+              <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-8 sm:space-y-10">
                 <section className="space-y-6">
                   <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Atributos Básicos</span>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -614,7 +614,7 @@ export default function ProductsPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-4 sm:flex-row bg-white/5 p-6 rounded-3xl ring-1 ring-white/10">
+                  <div className="flex flex-col gap-4 sm:flex-row bg-white/5 p-5 sm:p-6 rounded-3xl ring-1 ring-white/10">
                     <div className="flex-1 space-y-2">
                       <label className="text-xs font-bold text-slate-500 ml-1">Nuevo Punto de Precio</label>
                       <input

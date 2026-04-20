@@ -936,7 +936,7 @@ export default function ListDetailPage() {
           </div>
         ) : activeTab === 'settings' ? (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <section className="rounded-[2.5rem] border border-white/10 bg-white/5 p-8 backdrop-blur-md space-y-10">
+            <section className="rounded-3xl sm:rounded-[2.5rem] border border-white/10 bg-white/5 p-6 sm:p-10 backdrop-blur-md space-y-10">
               <div className="space-y-8">
                 <div className="space-y-4">
                   <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">General</span>
@@ -995,13 +995,13 @@ export default function ListDetailPage() {
                           <div className="grid gap-2">
                             {members.map((member) => (
                               <div key={member.id} className="flex items-center justify-between rounded-xl bg-white/5 p-3 ring-1 ring-white/5">
-                                <span className="text-sm font-medium text-slate-300">{member.user_id}</span>
+                                <span className="text-sm font-medium text-slate-300 truncate mr-2">{member.user_id}</span>
                                 <button
                                   onClick={() => removeMember(member)}
                                   disabled={removingMemberId === member.id}
-                                  className="text-xs font-bold text-rose-500 hover:text-rose-400 p-2"
+                                  className="text-xs font-bold text-rose-500 hover:text-rose-400 p-2 shrink-0"
                                 >
-                                  {removingMemberId === member.id ? 'Quitando...' : 'Quitar'}
+                                  {removingMemberId === member.id ? '...' : 'Quitar'}
                                 </button>
                               </div>
                             ))}
