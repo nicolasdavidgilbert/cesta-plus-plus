@@ -3,9 +3,12 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { insforge } from '@/lib/insforge'
 
+type ThemePreference = 'light' | 'dark'
+
 type UserProfile = {
   name?: string
   avatar_url?: string
+  theme?: ThemePreference
   [key: string]: unknown
 }
 
@@ -30,6 +33,8 @@ type UserContextType = {
   verifyEmail: (email: string, code: string) => Promise<{ error?: string }>
   refreshUser: () => Promise<void>
   updateProfile: (profile: Record<string, unknown>) => Promise<{ error?: string }>
+  themePreference: ThemePreference
+  setThemePreference: (theme: ThemePreference) => Promise<{ error?: string }>
 }
 
 const UserContext = createContext<UserContextType | null>(null)
@@ -39,6 +44,7 @@ const REFRESH_TOKEN_COOKIE = 'insforge_client_refresh_token'
 const ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 15
 const REFRESH_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7
 const SESSION_REFRESH_INTERVAL_MS = 8 * 60 * 1000
+const THEME_PREFERENCE_STORAGE_KEY = 'cesta_theme_preference'
 
 type RefreshResult =
   | { ok: true }
@@ -124,6 +130,26 @@ function isAuthSessionError(error: unknown) {
   if (errorMessage.includes('token expired')) return true
 
   return false
+}
+
+function isThemePreference(value: unknown): value is ThemePreference {
+  return value === 'light' || value === 'dark'
+}
+
+function applyThemePreference(theme: ThemePreference) {
+  if (typeof document === 'undefined') return
+  document.documentElement.classList.toggle('dark', theme === 'dark')
+}
+
+function getStoredThemePreference() {
+  if (typeof window === 'undefined') return null
+  const rawStoredTheme = window.localStorage.getItem(THEME_PREFERENCE_STORAGE_KEY)
+  return isThemePreference(rawStoredTheme) ? rawStoredTheme : null
+}
+
+function resolveThemePreference(profileTheme: unknown): ThemePreference {
+  if (isThemePreference(profileTheme)) return profileTheme
+  return getStoredThemePreference() ?? 'dark'
 }
 
 export function UserProvider({ children }: { children: ReactNode }) {
@@ -258,6 +284,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [checkUser])
 
   useEffect(() => {
+    const nextTheme = resolveThemePreference(user?.profile?.theme)
+    applyThemePreference(nextTheme)
+
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(THEME_PREFERENCE_STORAGE_KEY, nextTheme)
+    }
+  }, [user?.profile?.theme])
+
+  useEffect(() => {
     if (!user) return
 
     const refreshNow = () => {
@@ -328,6 +363,48 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return {}
   }
 
+  const themePreference = resolveThemePreference(user?.profile?.theme)
+
+  const setThemePreference = useCallback(async (nextTheme: ThemePreference) => {
+    const previousTheme = resolveThemePreference(user?.profile?.theme)
+    applyThemePreference(nextTheme)
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(THEME_PREFERENCE_STORAGE_KEY, nextTheme)
+    }
+
+    if (!user) return {}
+
+    const currentProfile = (user.profile ?? {}) as Record<string, unknown>
+    const payload: Record<string, unknown> = {
+      ...currentProfile,
+      theme: nextTheme,
+    }
+
+    const { error } = await insforge.auth.setProfile(payload)
+    if (error) {
+      applyThemePreference(previousTheme)
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(THEME_PREFERENCE_STORAGE_KEY, previousTheme)
+      }
+      return { error: error.message }
+    }
+
+    setUser((current) => {
+      if (!current) return current
+      const currentProfile = (current.profile ?? {}) as UserProfile
+      return {
+        ...current,
+        profile: {
+          ...currentProfile,
+          theme: nextTheme,
+        },
+      }
+    })
+
+    await checkUser()
+    return {}
+  }, [checkUser, user])
+
   async function signOut() {
     await insforge.auth.signOut()
     clearTokenCookies()
@@ -336,7 +413,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   return (
     <UserContext.Provider
-      value={{ user, loading, signIn, signUp, signOut, verifyEmail, refreshUser, updateProfile }}
+      value={{
+        user,
+        loading,
+        signIn,
+        signUp,
+        signOut,
+        verifyEmail,
+        refreshUser,
+        updateProfile,
+        themePreference,
+        setThemePreference,
+      }}
     >
       {children}
     </UserContext.Provider>

@@ -73,49 +73,49 @@ export default function SignUpPage() {
   const marketingElement = (
     <div className="space-y-8">
       <div className="space-y-4">
-        <span className="inline-flex rounded-full bg-[#fb923c]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#fb923c] ring-1 ring-[#fb923c]/20">
+        <span className="inline-flex rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-secondary ring-1 ring-secondary/20">
           Experiencia de compra
         </span>
-        <h2 className="text-4xl font-bold leading-[1.1] text-white bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+        <h2 className="text-4xl font-bold leading-[1.1] text-foreground bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground/90 to-foreground/60">
           Organiza tu hogar <br />
           en segundos.
         </h2>
-        <p className="max-w-md text-lg leading-relaxed text-slate-400">
+        <p className="max-w-md text-lg leading-relaxed text-muted-foreground">
           Cesta++ está diseñada para el día a día: crea listas, comparte y ahorra tiempo.
         </p>
       </div>
 
       {/* Interactive Preview */}
-      <div className="bg-white/10 backdrop-blur-2xl border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.2)] [background:linear-gradient(135deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))] rounded-[2.5rem] p-6 shadow-2xl animate-pulse">
+      <div className="bg-muted backdrop-blur-2xl border border-border shadow-2xl rounded-[2.5rem] p-6 animate-pulse">
         <div className="mb-4 flex items-center justify-between">
-          <p className="text-sm font-bold text-white uppercase tracking-widest">Lista Semanal</p>
-          <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-slate-400">4 items</span>
+          <p className="text-sm font-bold text-foreground uppercase tracking-widest">Lista Semanal</p>
+          <span className="rounded-full bg-muted/20 px-2 py-0.5 text-[10px] text-muted-foreground">4 items</span>
         </div>
         <ul className="space-y-3">
           {previewChecklist.map((row) => (
             <li
               key={row.item}
-              className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3 transition-colors hover:bg-white/10"
+              className="flex items-center justify-between rounded-2xl border border-border bg-muted/20 px-4 py-3 transition-colors hover:bg-muted/40"
             >
               <div className="flex items-center gap-3">
                 <div
                   className={`flex h-5 w-5 items-center justify-center rounded-lg border text-[10px] font-bold transition-all ${
                     row.done
-                      ? 'border-emerald-500 bg-emerald-500 text-white'
-                      : 'border-white/20 bg-white/5 text-transparent'
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-border bg-muted/20 text-transparent'
                   }`}
                 >
                   ✓
                 </div>
                 <span
                   className={`text-sm font-medium transition-all ${
-                    row.done ? 'text-slate-500 line-through decoration-[#fb923c]/50' : 'text-white'
+                    row.done ? 'text-muted-foreground line-through decoration-secondary/50' : 'text-foreground'
                   }`}
                 >
                   {row.item}
                 </span>
               </div>
-              <span className="text-[11px] font-bold text-[#fb923c] bg-[#fb923c]/10 px-2 py-0.5 rounded-full">{row.qty}</span>
+              <span className="text-[11px] font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">{row.qty}</span>
             </li>
           ))}
         </ul>
@@ -123,9 +123,9 @@ export default function SignUpPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {onboardingHighlights.map((h) => (
-          <div key={h.title} className="rounded-2xl border border-white/5 bg-white/5 p-4 backdrop-blur-sm">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-1">{h.title}</h3>
-            <p className="text-[10px] leading-relaxed text-slate-400">{h.description}</p>
+          <div key={h.title} className="rounded-2xl border border-border bg-muted/20 p-4 backdrop-blur-sm">
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider mb-1">{h.title}</h3>
+            <p className="text-[10px] leading-relaxed text-muted-foreground">{h.description}</p>
           </div>
         ))}
       </div>
@@ -146,13 +146,13 @@ export default function SignUpPage() {
         {/* Messages */}
         <div className="space-y-3">
           {error && (
-            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-400 font-medium animate-pulse">
+            <div className="rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive font-medium animate-pulse">
               {error}
             </div>
           )}
 
           {successMessage && (
-            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+            <div className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary">
               {successMessage}
             </div>
           )}
@@ -208,30 +208,30 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-4 py-4 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 px-4 py-4 text-sm font-bold text-secondary-foreground shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+              <span className="absolute inset-0 bg-foreground/10 opacity-0 transition-opacity group-hover:opacity-100" />
               {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
             </button>
           </form>
         ) : (
           <form onSubmit={handleVerify} className="space-y-6">
-            <div className="rounded-2xl border border-white/5 bg-white/5 p-4 text-center">
-              <p className="text-sm text-slate-400">
+            <div className="rounded-2xl border border-border bg-muted/20 p-4 text-center">
+              <p className="text-sm text-muted-foreground">
                 Hemos enviado un código a <br />
-                <strong className="text-white">{email}</strong>
+                <strong className="text-foreground">{email}</strong>
               </p>
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-slate-500 text-center block">
+              <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground text-center block">
                 Código de verificación
               </label>
               <input
                 type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                className="w-full tracking-[1em] text-center font-mono text-3xl font-bold rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-white outline-none transition-all placeholder:text-slate-800 focus:border-[#fb923c] focus:bg-slate-900/50 focus:ring-4 focus:ring-[#fb923c]/10"
+                className="w-full tracking-[1em] text-center font-mono text-3xl font-bold rounded-2xl border border-border bg-muted/20 px-4 py-5 text-foreground outline-none transition-all placeholder:text-muted-foreground/30 focus:border-secondary focus:bg-muted/40 focus:ring-4 focus:ring-secondary/10"
                 maxLength={6}
                 placeholder="000000"
                 required
@@ -241,16 +241,16 @@ export default function SignUpPage() {
             <button
               type="submit"
               disabled={loading || code.length !== 6}
-              className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-[#fb923c] px-4 py-4 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-secondary px-4 py-4 text-sm font-bold text-secondary-foreground shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+              <span className="absolute inset-0 bg-foreground/10 opacity-0 transition-opacity group-hover:opacity-100" />
               {loading ? 'Verificando...' : 'Verificar Cuenta'}
             </button>
             
             <button 
               type="button"
               onClick={() => setShowVerification(false)}
-              className="w-full text-center text-xs font-medium text-slate-500 hover:text-white transition-colors"
+              className="w-full text-center text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               ← Volver al registro
             </button>
@@ -258,11 +258,11 @@ export default function SignUpPage() {
         )}
 
         {!showVerification && (
-          <p className="text-center text-sm text-slate-500">
+          <p className="text-center text-sm text-muted-foreground">
             ¿Ya tienes una cuenta?{' '}
             <Link
               href={redirectPath === '/dashboard' ? '/sign-in' : `/sign-in?redirect=${encodeURIComponent(redirectPath)}`}
-              className="font-bold text-[#fb923c] hover:text-[#f59e0b] transition-colors"
+              className="font-bold text-secondary hover:opacity-80 transition-all"
             >
               Inicia sesión
             </Link>

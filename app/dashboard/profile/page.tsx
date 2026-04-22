@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
 import MobileDashboardNav from '@/app/dashboard/_components/MobileDashboardNav'
@@ -13,7 +14,10 @@ type ProfileFields = {
 
 export default function ProfilePage() {
   const router = useRouter()
-  const { user, loading, signOut, updateProfile } = useUser()
+  const { user, loading, signOut, updateProfile, themePreference, setThemePreference } = useUser()
+  const [savingTheme, setSavingTheme] = useState(false)
+  const [themeError, setThemeError] = useState('')
+  const [themeSuccess, setThemeSuccess] = useState('')
 
   useEffect(() => {
     if (!loading && !user) {
@@ -26,12 +30,29 @@ export default function ProfilePage() {
     router.push('/sign-in')
   }
 
+  async function handleThemeChange(nextTheme: 'light' | 'dark') {
+    if (savingTheme || nextTheme === themePreference) return
+
+    setSavingTheme(true)
+    setThemeError('')
+    setThemeSuccess('')
+
+    const result = await setThemePreference(nextTheme)
+    if (result.error) {
+      setThemeError(result.error)
+    } else {
+      setThemeSuccess('Preferencia de tema guardada.')
+    }
+
+    setSavingTheme(false)
+  }
+
   if (loading || !user) {
     return (
       <main className="flex min-h-screen items-center justify-center p-6">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-[#fb923c]" />
-          <p className="text-sm font-bold uppercase tracking-widest text-[#fb923c]">Sincronizando perfil</p>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-border border-t-secondary" />
+          <p className="text-sm font-bold uppercase tracking-widest text-secondary">Sincronizando perfil</p>
         </div>
       </main>
     )
@@ -44,7 +65,7 @@ export default function ProfilePage() {
           <header className="space-y-4">
              <Link
                 href="/dashboard"
-                className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-all hover:bg-white/10 hover:text-white"
+                className="group inline-flex items-center gap-2 rounded-full border border-border bg-muted/20 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted/40 hover:text-foreground"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 transition-transform group-hover:-translate-x-1">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -52,17 +73,17 @@ export default function ProfilePage() {
                 Regresar
               </Link>
             <div className="space-y-1.5 px-1">
-              <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground/90 to-foreground/60">
                 Tu Identidad
               </h1>
-              <p className="text-sm text-slate-500 font-medium tracking-tight">Personaliza tu presencia y gestiona tu cuenta.</p>
+              <p className="text-sm text-muted-foreground font-medium tracking-tight">Personaliza tu presencia y gestiona tu cuenta.</p>
             </div>
           </header>
 
           <div className="grid gap-8 lg:grid-cols-5">
             <div className="lg:col-span-3 space-y-8">
-              <section className="rounded-3xl sm:rounded-[2.5rem] border border-white/10 bg-white/5 p-6 sm:p-10 backdrop-blur-md">
-                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Configuración Pública</span>
+              <section className="rounded-3xl sm:rounded-[2.5rem] border border-border bg-muted/20 p-6 sm:p-10 backdrop-blur-md">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary ml-1">Configuración Pública</span>
                 <ProfileForm
                   key={`${user.id}:${user.updatedAt || 'static'}`}
                   initialProfile={{
@@ -77,8 +98,50 @@ export default function ProfilePage() {
             </div>
 
             <div className="lg:col-span-2 space-y-8">
-              <section className="rounded-3xl sm:rounded-[2.5rem] border border-white/10 bg-white/5 p-6 sm:p-10 backdrop-blur-md space-y-8">
-                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Detalles de Cuenta</span>
+              <section className="rounded-3xl sm:rounded-[2.5rem] border border-border bg-muted/20 p-6 sm:p-10 backdrop-blur-md space-y-8">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary ml-1">Detalles de Cuenta</span>
+                <div className="space-y-3">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Tema</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleThemeChange('light')}
+                      disabled={savingTheme}
+                      className={`rounded-xl border px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all ${
+                        themePreference === 'light'
+                          ? 'border-secondary/40 bg-secondary/15 text-secondary'
+                          : 'border-border bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground'
+                      } disabled:opacity-60 disabled:cursor-not-allowed`}
+                    >
+                      Claro
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleThemeChange('dark')}
+                      disabled={savingTheme}
+                      className={`rounded-xl border px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-all ${
+                        themePreference === 'dark'
+                          ? 'border-secondary/40 bg-secondary/15 text-secondary'
+                          : 'border-border bg-muted/20 text-muted-foreground hover:bg-muted/40 hover:text-foreground'
+                      } disabled:opacity-60 disabled:cursor-not-allowed`}
+                    >
+                      Oscuro
+                    </button>
+                  </div>
+                  {themeError && (
+                    <div className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-2.5 text-xs font-medium text-destructive">
+                      {themeError}
+                    </div>
+                  )}
+                  {themeSuccess && (
+                    <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-2.5 text-xs font-medium text-primary">
+                      {themeSuccess}
+                    </div>
+                  )}
+                </div>
+
+                <div className="h-px bg-border/30" />
+
                 <div className="space-y-4">
                   {[
                     { label: 'Correo Electrónico', value: user.email },
@@ -87,18 +150,18 @@ export default function ProfilePage() {
                     { label: 'Método de Acceso', value: user.providers?.join(', ') || 'N/A' },
                   ].map((item, idx) => (
                     <div key={idx} className="space-y-1.5 group">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">{item.label}</p>
-                      <div className="rounded-2xl border border-white/5 bg-white/5 px-5 py-3.5 text-sm font-medium text-slate-300 ring-1 ring-white/5 transition-all group-hover:bg-white/10 group-hover:text-white break-all sm:truncate">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">{item.label}</p>
+                      <div className="rounded-2xl border border-border bg-muted/20 px-5 py-3.5 text-sm font-medium text-foreground/80 ring-1 ring-border/20 transition-all group-hover:bg-muted/40 group-hover:text-foreground break-all sm:truncate">
                         {item.value}
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="pt-6 border-t border-white/5">
+                <div className="pt-6 border-t border-border">
                   <button
                     onClick={handleSignOut}
-                    className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-rose-500/20 bg-rose-500/5 py-4 text-sm font-bold text-rose-500 transition-all hover:bg-rose-500 hover:text-white active:scale-95"
+                    className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-destructive/20 bg-destructive/5 py-4 text-sm font-bold text-destructive transition-all hover:bg-destructive hover:text-destructive-foreground active:scale-95"
                   >
                     Cerrar Sesión Activa
                   </button>
@@ -128,7 +191,7 @@ function ProfileForm({
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const inputClassName = "w-full rounded-2xl border border-white/10 bg-white/5 px-5 sm:px-6 py-3.5 sm:py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5"
+  const inputClassName = "w-full rounded-2xl border border-border bg-muted/20 px-5 sm:px-6 py-3.5 sm:py-4 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-secondary/40 focus:bg-muted/40 focus:ring-4 focus:ring-secondary/10"
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -165,11 +228,14 @@ function ProfileForm({
         <div className="space-y-4">
           <div className="flex flex-col gap-8 sm:flex-row sm:items-center">
             <div className="relative group flex justify-center sm:justify-start">
-              <div className="h-28 w-28 rounded-3xl overflow-hidden ring-4 ring-white/5 bg-slate-800 flex items-center justify-center transition-all group-hover:ring-[#fb923c]/20">
+              <div className="h-28 w-28 rounded-3xl overflow-hidden ring-4 ring-border/20 bg-muted/30 flex items-center justify-center transition-all group-hover:ring-secondary/30">
                 {profile.avatar_url ? (
-                  <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+                  </>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12 text-slate-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12 text-muted-foreground">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                   </svg>
                 )}
@@ -177,7 +243,7 @@ function ProfileForm({
             </div>
             <div className="flex-1 space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 ml-1">Nombre Completo</label>
+                <label className="text-xs font-bold text-muted-foreground ml-1">Nombre Completo</label>
                 <input
                   type="text"
                   value={profile.name}
@@ -187,7 +253,7 @@ function ProfileForm({
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 ml-1">URL de Avatar</label>
+                <label className="text-xs font-bold text-muted-foreground ml-1">URL de Avatar</label>
                 <input
                   type="url"
                   value={profile.avatar_url}
@@ -201,7 +267,7 @@ function ProfileForm({
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-500 ml-1">Biografía Breve</label>
+          <label className="text-xs font-bold text-muted-foreground ml-1">Biografía Breve</label>
           <textarea
             value={profile.bio}
             onChange={(e) => setProfile((prev) => ({ ...prev, bio: e.target.value }))}
@@ -213,12 +279,12 @@ function ProfileForm({
 
       <div className="pt-4 space-y-4">
         {error && (
-          <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-6 py-4 text-sm font-medium text-rose-400">
+          <div className="rounded-2xl border border-destructive/20 bg-destructive/10 px-6 py-4 text-sm font-medium text-destructive">
             {error}
           </div>
         )}
         {success && (
-          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-6 py-4 text-sm font-medium text-emerald-400">
+          <div className="rounded-2xl border border-primary/20 bg-primary/10 px-6 py-4 text-sm font-medium text-primary">
             {success}
           </div>
         )}
@@ -226,14 +292,12 @@ function ProfileForm({
         <button
           type="submit"
           disabled={saving}
-          className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-8 py-4 text-base font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 sm:w-auto"
+          className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 px-8 py-4 text-base font-bold text-secondary-foreground shadow-xl shadow-secondary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 sm:w-auto"
         >
-          <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+          <span className="absolute inset-0 bg-foreground/10 opacity-0 transition-opacity group-hover:opacity-100" />
           {saving ? 'Guardando...' : 'Salvar Cambios'}
         </button>
       </div>
     </form>
   )
 }
-
-import Link from 'next/link'

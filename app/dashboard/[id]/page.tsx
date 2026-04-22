@@ -70,7 +70,7 @@ type ListChangedRealtimePayload = RealtimePayload & {
 type DashboardTab = 'products' | 'settings' | 'stats'
 
 const inputClassName =
-  'w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5'
+  'w-full rounded-2xl border border-border bg-muted/40 px-6 py-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all focus:border-secondary/40 focus:bg-muted/60 focus:ring-4 focus:ring-secondary/5'
 
 export default function ListDetailPage() {
   const router = useRouter()
@@ -422,18 +422,6 @@ export default function ListDetailPage() {
     }
   }
 
-  function openGmailForInvite(token: string) {
-    const inviteUrl = buildInviteUrl(token)
-    const to = shareEmail.trim()
-    const subject = encodeURIComponent(`Únete a mi lista "${list?.name || 'Lista de compra'}"`)
-    const body = encodeURIComponent(
-      `Te comparto mi lista para que podamos editarla juntos.\n\nÚnete aquí: ${inviteUrl}`
-    )
-    const target = to ? `&to=${encodeURIComponent(to)}` : ''
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1${target}&su=${subject}&body=${body}`
-    window.open(gmailUrl, '_blank', 'noopener,noreferrer')
-  }
-
   async function updateListName() {
     if (!canManageMembers || !list) return
     const nextName = listNameDraft.trim()
@@ -719,10 +707,10 @@ export default function ListDetailPage() {
 
   if (authLoading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center p-6">
+      <main className="flex min-h-screen items-center justify-center p-6 bg-background">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-[#fb923c]" />
-          <p className="text-sm font-bold uppercase tracking-widest text-[#fb923c]">Sincronizando lista</p>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-muted border-t-secondary" />
+          <p className="text-sm font-bold uppercase tracking-widest text-secondary">Sincronizando lista</p>
         </div>
       </main>
     )
@@ -736,7 +724,7 @@ export default function ListDetailPage() {
             <div className="space-y-4">
               <Link
                 href="/dashboard"
-                className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-all hover:bg-white/10 hover:text-white"
+                className="group inline-flex items-center gap-2 rounded-full border border-border bg-muted/20 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted/40 hover:text-foreground"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 transition-transform group-hover:-translate-x-1">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -744,21 +732,21 @@ export default function ListDetailPage() {
                 Volver al Panel
               </Link>
               <div className="space-y-1">
-                <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+                <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground/90 to-foreground/60">
                   {list?.name || 'Cargando...'}
                 </h1>
-                <p className="text-sm text-slate-500 font-medium tracking-tight">Gestiona productos, ajusta cantidades y controla tu presupuesto.</p>
+                <p className="text-sm text-muted-foreground font-medium tracking-tight">Gestiona productos, ajusta cantidades y controla tu presupuesto.</p>
               </div>
             </div>
 
-            <div className="relative group overflow-hidden rounded-[2rem] border border-[#fb923c]/20 bg-[#fb923c]/5 p-6 backdrop-blur-md min-w-[240px]">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#fb923c]/10 to-transparent opacity-50" />
+            <div className="relative group overflow-hidden rounded-[2rem] border border-secondary/20 bg-secondary/5 p-6 backdrop-blur-md min-w-[240px]">
+              <div className="absolute inset-0 bg-gradient-to-br from-secondary/10 to-transparent opacity-50" />
               <div className="relative space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]/80">Total Marcado</p>
-                <p className="text-3xl font-black text-white">{checkedTotal.toFixed(2)} <span className="text-sm font-bold text-[#fb923c]">EUR</span></p>
-                <div className="mt-4 w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary/80">Total Marcado</p>
+                <p className="text-3xl font-black text-foreground">{checkedTotal.toFixed(2)} <span className="text-sm font-bold text-secondary">EUR</span></p>
+                <div className="mt-4 w-full h-1.5 bg-muted/20 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-[#fb923c] to-[#f59e0b] transition-all duration-700 ease-out"
+                    className="h-full bg-gradient-to-r from-secondary to-secondary/80 transition-all duration-700 ease-out"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -766,7 +754,7 @@ export default function ListDetailPage() {
             </div>
           </div>
 
-          <div className="flex w-full items-center gap-1 rounded-2xl border border-white/10 bg-white/5 p-1.5 backdrop-blur-md overflow-x-auto sm:overflow-x-visible">
+          <div className="flex w-full items-center gap-1 rounded-2xl border border-border bg-muted/20 p-1.5 backdrop-blur-md overflow-x-auto sm:overflow-x-visible">
             {([
               { id: 'products', label: 'Productos', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25-2.25M12 13.875V7.5M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg> },
               { id: 'settings', label: 'Gestión', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg> },
@@ -777,8 +765,8 @@ export default function ListDetailPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-2.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-lg shadow-[#fb923c]/20'
-                    : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
+                    ? 'bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground shadow-lg shadow-secondary/20'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
                 }`}
               >
                 {tab.icon}
@@ -790,7 +778,7 @@ export default function ListDetailPage() {
         </header>
 
         {error && (
-          <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-6 py-4 text-sm font-medium text-rose-400 backdrop-blur-md">
+          <div className="rounded-2xl border border-destructive/20 bg-destructive/10 px-6 py-4 text-sm font-medium text-destructive backdrop-blur-md">
             {error}
           </div>
         )}
@@ -798,27 +786,27 @@ export default function ListDetailPage() {
         {loading ? (
           <div className="grid gap-4 py-10">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-20 animate-pulse rounded-2xl border border-white/5 bg-white/5" />
+              <div key={i} className="h-20 animate-pulse rounded-2xl border border-border bg-muted/20" />
             ))}
           </div>
         ) : activeTab === 'products' ? (
           <div className="space-y-8">
             {uncheckedItems.length === 0 && checkedItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center space-y-6">
-                <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-white/5 text-slate-600 ring-1 ring-white/10">
+                <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-muted/20 text-muted-foreground ring-1 ring-border/20">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                   </svg>
                 </div>
                 <div className="space-y-2">
-                  <h2 className="text-xl font-bold text-white tracking-tight">Tu lista está vacía</h2>
-                  <p className="text-slate-500 text-sm max-w-xs mx-auto">Añade productos de tu catálogo o crea nuevos para empezar a comprar.</p>
+                  <h2 className="text-xl font-bold text-foreground tracking-tight">Tu lista está vacía</h2>
+                  <p className="text-muted-foreground text-sm max-w-xs mx-auto">Añade productos de tu catálogo o crea nuevos para empezar a comprar.</p>
                 </div>
                 <button
                   onClick={() => setShowAddProduct(true)}
-                  className="group relative inline-flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-8 py-4 text-base font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95"
+                  className="group relative inline-flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 px-8 py-4 text-base font-bold text-secondary-foreground shadow-xl shadow-secondary/20 transition-all hover:scale-[1.02] active:scale-95"
                 >
-                  <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+                  <span className="absolute inset-0 bg-foreground/10 opacity-0 transition-opacity group-hover:opacity-100" />
                   Añadir mi primer producto
                 </button>
               </div>
@@ -826,47 +814,47 @@ export default function ListDetailPage() {
               <section className="space-y-6">
                 {uncheckedItems.length > 0 && (
                   <div className="space-y-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c] ml-1">Por comprar</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary ml-1">Por comprar</p>
                     <div className="space-y-3">
                       {uncheckedItems.map((item) => (
                         <div 
                           key={item.id} 
-                          className="group relative flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 p-4 backdrop-blur-sm transition-all hover:bg-white/10"
+                          className="group relative flex items-center justify-between rounded-2xl border border-border bg-muted/20 p-4 backdrop-blur-sm transition-all hover:bg-muted/40"
                         >
                           <div className="flex items-center gap-4 flex-1">
                             <button
                               onClick={() => toggleChecked(item)}
                               disabled={updatingItems.has(item.id)}
-                              className={`group/check relative flex h-7 w-7 items-center justify-center rounded-xl border-2 border-white/10 bg-white/5 text-transparent transition-all hover:border-[#fb923c]/50 active:scale-90 ${updatingItems.has(item.id) ? 'opacity-50 cursor-wait' : ''}`}
+                              className={`group/check relative flex h-7 w-7 items-center justify-center rounded-xl border-2 border-border bg-muted/20 text-transparent transition-all hover:border-secondary/50 active:scale-90 ${updatingItems.has(item.id) ? 'opacity-50 cursor-wait' : ''}`}
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="currentColor" className="w-4 h-4 group-hover/check:text-[#fb923c]/20">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="currentColor" className="w-4 h-4 group-hover/check:text-secondary/20">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                               </svg>
                             </button>
                             <div className="space-y-0.5">
-                              <h4 className="text-sm font-bold text-white tracking-tight">{item.product?.title || 'Producto desconocido'}</h4>
-                              <p className="text-xs font-semibold text-[#fb923c]/60">
+                              <h4 className="text-sm font-bold text-foreground tracking-tight">{item.product?.title || 'Producto desconocido'}</h4>
+                              <p className="text-xs font-semibold text-secondary/60">
                                 {item.product?.current_price ? `${(item.product.current_price * item.quantity).toFixed(2)} EUR` : 'Sin precio'}
                               </p>
                             </div>
                           </div>
                           
                           <div className="flex items-center gap-6">
-                            <div className={`flex items-center gap-1.5 rounded-xl border border-white/5 bg-white/5 p-1 ring-1 ring-white/5 ${updatingItems.has(item.id) ? 'opacity-50 pointer-events-none' : ''}`}>
+                            <div className={`flex items-center gap-1.5 rounded-xl border border-border bg-muted/20 p-1 ring-1 ring-border/20 ${updatingItems.has(item.id) ? 'opacity-50 pointer-events-none' : ''}`}>
                               <button
                                 onClick={() => updateQuantity(item, -1)}
                                 disabled={updatingItems.has(item.id)}
-                                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 transition-all"
+                                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/20 hover:text-destructive transition-all"
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
                                 </svg>
                               </button>
-                              <span className="w-6 text-center text-xs font-bold text-white">{item.quantity}</span>
+                              <span className="w-6 text-center text-xs font-bold text-foreground">{item.quantity}</span>
                               <button
                                 onClick={() => updateQuantity(item, 1)}
                                 disabled={updatingItems.has(item.id)}
-                                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-emerald-500/20 hover:text-emerald-400 transition-all"
+                                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-primary/20 hover:text-primary transition-all"
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3">
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -876,7 +864,7 @@ export default function ListDetailPage() {
                             <button
                               onClick={() => removeItem(item.id)}
                               disabled={updatingItems.has(item.id)}
-                              className="hidden group-hover:flex h-8 w-8 items-center justify-center rounded-lg text-slate-600 hover:bg-rose-500/10 hover:text-rose-500 transition-all disabled:opacity-30"
+                              className="hidden group-hover:flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all disabled:opacity-30"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -891,31 +879,31 @@ export default function ListDetailPage() {
 
                 {checkedItems.length > 0 && (
                   <div className="space-y-3">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-emerald-500/60 ml-1">En el carrito</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary/70 ml-1">En el carrito</p>
                     <div className="space-y-3 opacity-60">
                       {checkedItems.map((item) => (
                         <div 
                           key={item.id} 
-                          className="group relative flex items-center justify-between rounded-2xl border border-white/5 bg-slate-900/40 p-4 transition-all hover:bg-slate-900/60"
+                          className="group relative flex items-center justify-between rounded-2xl border border-border bg-muted/40 p-4 transition-all hover:bg-muted/60"
                         >
                           <div className="flex items-center gap-4 flex-1">
                             <button
                               onClick={() => toggleChecked(item)}
                               disabled={updatingItems.has(item.id)}
-                              className={`flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20 transition-all active:scale-90 ${updatingItems.has(item.id) ? 'opacity-50 cursor-wait' : ''}`}
+                              className={`flex h-7 w-7 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition-all active:scale-90 ${updatingItems.has(item.id) ? 'opacity-50 cursor-wait' : ''}`}
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={4} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                               </svg>
                             </button>
                             <div className="space-y-0.5">
-                              <h4 className="text-sm font-bold text-slate-300 tracking-tight line-through decoration-emerald-500/50">{item.product?.title}</h4>
-                              <p className="text-xs font-semibold text-slate-500">
+                              <h4 className="text-sm font-bold text-muted-foreground tracking-tight line-through decoration-primary/50">{item.product?.title}</h4>
+                              <p className="text-xs font-semibold text-muted-foreground/60">
                                 {item.product?.current_price ? `${(item.product.current_price * item.quantity).toFixed(2)} EUR` : '-'}
                               </p>
                             </div>
                           </div>
-                          <span className="text-xs font-black text-slate-600 bg-white/5 px-2.5 py-1 rounded-full">{item.quantity} ud.</span>
+                          <span className="text-xs font-black text-muted-foreground bg-muted/40 px-2.5 py-1 rounded-full">{item.quantity} ud.</span>
                         </div>
                       ))}
                     </div>
@@ -926,9 +914,9 @@ export default function ListDetailPage() {
             
             <button
               onClick={() => setShowAddProduct(true)}
-              className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 py-4 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10 active:scale-[0.98]"
+              className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl border border-border bg-muted/20 py-4 text-sm font-bold text-foreground backdrop-blur-sm transition-all hover:bg-muted/40 active:scale-[0.98]"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4 mr-2 text-[#fb923c]">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4 mr-2 text-secondary">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
               Añadir Producto
@@ -936,12 +924,12 @@ export default function ListDetailPage() {
           </div>
         ) : activeTab === 'settings' ? (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <section className="rounded-3xl sm:rounded-[2.5rem] border border-white/10 bg-white/5 p-6 sm:p-10 backdrop-blur-md space-y-10">
+            <section className="rounded-3xl sm:rounded-[2.5rem] border border-border bg-muted/20 p-6 sm:p-10 backdrop-blur-md space-y-10">
               <div className="space-y-8">
                 <div className="space-y-4">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">General</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">General</span>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-400 ml-1">Nombre de la lista</label>
+                    <label className="text-xs font-bold text-muted-foreground ml-1">Nombre de la lista</label>
                     <div className="flex flex-col gap-3 sm:flex-row">
                       <input
                         type="text"
@@ -955,7 +943,7 @@ export default function ListDetailPage() {
                         <button
                           onClick={() => void updateListName()}
                           disabled={savingListName || !listNameDraft.trim()}
-                          className="group relative flex shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white px-8 py-3 text-sm font-bold text-slate-900 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                          className="group relative flex shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-foreground px-8 py-3 text-sm font-bold text-background transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                         >
                           {savingListName ? 'Guardando...' : 'Actualizar'}
                         </button>
@@ -964,10 +952,10 @@ export default function ListDetailPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4 pt-4 border-t border-white/5">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Compartir con Email</span>
+                <div className="space-y-4 pt-4 border-t border-border">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Compartir con Email</span>
                   {!canManageMembers ? (
-                    <p className="rounded-2xl bg-amber-500/10 p-4 text-xs font-medium text-amber-500 ring-1 ring-amber-500/20">
+                    <p className="rounded-2xl bg-secondary/10 p-4 text-xs font-medium text-secondary ring-1 ring-secondary/20">
                       Solo el propietario puede gestionar los accesos compartidos.
                     </p>
                   ) : (
@@ -983,7 +971,7 @@ export default function ListDetailPage() {
                         <button
                           onClick={() => void addMemberByEmail()}
                           disabled={sharingEmail || !shareEmail.trim()}
-                          className="group relative flex shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-8 py-3 text-sm font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                          className="group relative flex shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 px-8 py-3 text-sm font-bold text-secondary-foreground shadow-xl shadow-secondary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                         >
                           {sharingEmail ? 'Compartiendo...' : 'Compartir'}
                         </button>
@@ -991,15 +979,15 @@ export default function ListDetailPage() {
                       
                       {members.length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Miembros actuales</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Miembros actuales</p>
                           <div className="grid gap-2">
                             {members.map((member) => (
-                              <div key={member.id} className="flex items-center justify-between rounded-xl bg-white/5 p-3 ring-1 ring-white/5">
-                                <span className="text-sm font-medium text-slate-300 truncate mr-2">{member.user_id}</span>
+                              <div key={member.id} className="flex items-center justify-between rounded-xl bg-muted/20 p-3 ring-1 ring-border/20">
+                                <span className="text-sm font-medium text-muted-foreground truncate mr-2">{member.user_id}</span>
                                 <button
                                   onClick={() => removeMember(member)}
                                   disabled={removingMemberId === member.id}
-                                  className="text-xs font-bold text-rose-500 hover:text-rose-400 p-2 shrink-0"
+                                  className="text-xs font-bold text-destructive hover:text-destructive/80 p-2 shrink-0"
                                 >
                                   {removingMemberId === member.id ? '...' : 'Quitar'}
                                 </button>
@@ -1012,16 +1000,16 @@ export default function ListDetailPage() {
                   )}
                 </div>
 
-                <div className="space-y-4 pt-4 border-t border-white/5">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Enlaces de Invitación</span>
+                <div className="space-y-4 pt-4 border-t border-border">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Enlaces de Invitación</span>
                   {canManageMembers && (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs text-slate-500 max-w-[240px]">Envía un enlace rápido por WhatsApp o Telegram.</p>
+                        <p className="text-xs text-muted-foreground max-w-[240px]">Envía un enlace rápido por WhatsApp o Telegram.</p>
                         <button
                           onClick={() => void createInviteLink()}
                           disabled={generatingInviteLink}
-                          className="flex items-center justify-center rounded-xl bg-white/5 px-4 py-2 text-xs font-bold text-white ring-1 ring-white/20 transition-all hover:bg-white/10"
+                          className="flex items-center justify-center rounded-xl bg-muted/20 px-4 py-2 text-xs font-bold text-foreground ring-1 ring-border/40 transition-all hover:bg-muted/40"
                         >
                           {generatingInviteLink ? 'Generando...' : 'Nuevo Enlace'}
                         </button>
@@ -1029,18 +1017,18 @@ export default function ListDetailPage() {
 
                       <div className="grid gap-3">
                         {loadingInviteLinks ? (
-                          <div className="h-20 animate-pulse rounded-2xl bg-white/5" />
+                          <div className="h-20 animate-pulse rounded-2xl bg-muted/20" />
                         ) : inviteLinks.length === 0 ? (
-                          <p className="text-center py-6 text-xs text-slate-600 font-medium italic">No hay enlaces activos en este momento.</p>
+                          <p className="text-center py-6 text-xs text-muted-foreground font-medium italic">No hay enlaces activos en este momento.</p>
                         ) : (
                           inviteLinks.map((invite) => (
-                            <div key={invite.id} className="flex flex-col gap-3 rounded-2xl bg-slate-900/50 p-4 ring-1 ring-white/5">
-                              <p className="truncate text-[10px] font-mono text-slate-500 uppercase tracking-tighter">{buildInviteUrl(invite.token)}</p>
+                            <div key={invite.id} className="flex flex-col gap-3 rounded-2xl bg-muted/40 p-4 ring-1 ring-border/20">
+                              <p className="truncate text-[10px] font-mono text-muted-foreground uppercase tracking-tighter">{buildInviteUrl(invite.token)}</p>
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => void copyInviteLink(invite.token)}
                                   className={`flex-1 flex items-center justify-center rounded-xl py-2.5 text-[10px] font-bold uppercase transition-all ${
-                                    copiedLinkToken === invite.token ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                                    copiedLinkToken === invite.token ? 'bg-primary/20 text-primary' : 'bg-muted/20 text-muted-foreground hover:bg-muted/40'
                                   }`}
                                 >
                                   {copiedLinkToken === invite.token ? 'Enlace Copiado' : 'Copiar URL'}
@@ -1048,7 +1036,7 @@ export default function ListDetailPage() {
                                 <button
                                   onClick={() => revokeInviteLink(invite)}
                                   disabled={revokingInviteId === invite.id}
-                                  className="flex-1 flex items-center justify-center rounded-xl bg-rose-500/10 py-2.5 text-[10px] font-bold uppercase text-rose-500 hover:bg-rose-500/20 transition-all"
+                                  className="flex-1 flex items-center justify-center rounded-xl bg-destructive/10 py-2.5 text-[10px] font-bold uppercase text-destructive hover:bg-destructive/20 transition-all"
                                 >
                                   Revocar
                                 </button>
@@ -1064,10 +1052,10 @@ export default function ListDetailPage() {
 
               {canManageMembers && (
                 <div className="pt-10 space-y-4">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-rose-500/80">Zona de Riesgo</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-destructive/80">Zona de Riesgo</span>
                   <button
                     onClick={() => void deleteList()}
-                    className="flex w-full items-center justify-center rounded-2xl border border-rose-500/20 bg-rose-500/5 py-4 text-sm font-bold text-rose-500 transition-all hover:bg-rose-500 hover:text-white"
+                    className="flex w-full items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/5 py-4 text-sm font-bold text-destructive transition-all hover:bg-destructive hover:text-destructive-foreground"
                   >
                     Eliminar Lista Permanentemente
                   </button>
@@ -1077,15 +1065,15 @@ export default function ListDetailPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-indigo-500/10 text-indigo-400 ring-1 ring-indigo-500/20">
+             <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-accent/60 text-accent-foreground ring-1 ring-accent/40">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
               </svg>
             </div>
             <div className="space-y-2">
-              <h2 className="text-xl font-bold text-white tracking-tight">Estamos preparando tus datos</h2>
-              <p className="text-slate-500 text-sm max-w-xs mx-auto">Pronto podrás visualizar informes detallados sobre tus hábitos de compra y ahorro.</p>
+              <h2 className="text-xl font-bold text-foreground tracking-tight">Estamos preparando tus datos</h2>
+              <p className="text-muted-foreground text-sm max-w-xs mx-auto">Pronto podrás visualizar informes detallados sobre tus hábitos de compra y ahorro.</p>
             </div>
           </div>
         )}
@@ -1093,16 +1081,16 @@ export default function ListDetailPage() {
 
       {/* Modern Add Product Modal */}
       {showAddProduct && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-0 sm:p-6">
-          <div className="w-full max-w-2xl h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-[2.5rem] border border-white/10 bg-slate-900 shadow-2xl overflow-hidden">
-            <div className="p-8 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 backdrop-blur-md p-0 sm:p-6">
+          <div className="w-full max-w-2xl h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-[2.5rem] border border-border bg-muted shadow-2xl overflow-hidden">
+            <div className="p-8 border-b border-border flex items-center justify-between bg-foreground/[0.02]">
               <div className="space-y-1">
-                <h3 className="text-2xl font-bold text-white tracking-tight">Gestionar Productos</h3>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Añade o crea nuevos ítems</p>
+                <h3 className="text-2xl font-bold text-foreground tracking-tight">Gestionar Productos</h3>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Añade o crea nuevos ítems</p>
               </div>
               <button
                 onClick={() => setShowAddProduct(false)}
-                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-slate-400 hover:text-white transition-colors"
+                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/40 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1112,10 +1100,10 @@ export default function ListDetailPage() {
 
             <div className="flex-1 overflow-y-auto p-8 space-y-10">
               <div className="space-y-6">
-                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Tu Catálogo</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Tu Catálogo</span>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {products.length === 0 ? (
-                    <p className="col-span-full py-10 text-center text-xs text-slate-600 italic">No tienes productos guardados en tu catálogo.</p>
+                    <p className="col-span-full py-10 text-center text-xs text-muted-foreground italic">No tienes productos guardados en tu catálogo.</p>
                   ) : (
                     products.map((p) => {
                       const isAdded = items.some((i) => i.product_id === p.id)
@@ -1123,16 +1111,16 @@ export default function ListDetailPage() {
                         <button
                           key={p.id}
                           onClick={() => void addExistingProduct(p.id)}
-                          className="flex items-center justify-between rounded-[1.25rem] border border-white/5 bg-white/5 p-4 text-left transition-all hover:bg-white/10 hover:border-[#fb923c]/20"
+                          className="flex items-center justify-between rounded-[1.25rem] border border-border bg-muted/40 p-4 text-left transition-all hover:bg-muted/60 hover:border-secondary/20"
                         >
                           <div className="space-y-0.5">
-                            <p className="text-sm font-bold text-white leading-tight">{p.title}</p>
-                            <p className="text-[10px] font-bold text-[#fb923c]">{p.current_price ? `${p.current_price.toFixed(2)} EUR` : 'S/P'}</p>
+                            <p className="text-sm font-bold text-foreground leading-tight">{p.title}</p>
+                            <p className="text-[10px] font-bold text-secondary">{p.current_price ? `${p.current_price.toFixed(2)} EUR` : 'S/P'}</p>
                           </div>
-                          <div className={`h-8 w-8 flex items-center justify-center rounded-lg transition-all ${isAdded ? 'bg-emerald-500 text-white' : 'bg-white/5 text-slate-500'}`}>
+                          <div className={`h-8 w-8 flex items-center justify-center rounded-lg transition-all ${isAdded ? 'bg-primary text-primary-foreground' : 'bg-muted/20 text-muted-foreground'}`}>
                             {isAdded ? (
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-4 h-4">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                               </svg>
                             ) : (
                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
@@ -1147,8 +1135,8 @@ export default function ListDetailPage() {
                 </div>
               </div>
 
-              <div className="space-y-6 pt-4 border-t border-white/5">
-                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Nuevo Producto Rápido</span>
+              <div className="space-y-6 pt-4 border-t border-border">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Nuevo Producto Rápido</span>
                 <form onSubmit={createAndAddProduct} className="grid gap-4">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <input
@@ -1160,8 +1148,7 @@ export default function ListDetailPage() {
                       required
                     />
                     <input
-                      type="number"
-                      step="0.01"
+                      type="text"
                       value={newProduct.price}
                       onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
                       placeholder="Precio estimado (EUR)"
@@ -1171,7 +1158,7 @@ export default function ListDetailPage() {
                   <button
                     type="submit"
                     disabled={creatingProduct || !newProduct.title.trim()}
-                    className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-white animate-pulse-once px-6 py-4 text-base font-bold text-slate-900 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                    className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-foreground animate-pulse-once px-6 py-4 text-base font-bold text-background transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                   >
                     {creatingProduct ? 'Creando...' : 'Crear y Añadir'}
                   </button>

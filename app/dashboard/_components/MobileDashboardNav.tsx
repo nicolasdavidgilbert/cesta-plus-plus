@@ -44,7 +44,7 @@ export default function MobileDashboardNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-6 z-40 px-4 sm:px-6">
-      <div className="mx-auto flex w-full max-w-lg items-center justify-around gap-2 rounded-2xl border border-white/10 bg-slate-900/60 p-2 shadow-2xl backdrop-blur-2xl ring-1 ring-white/5">
+      <div className="mx-auto flex w-full max-w-lg items-center justify-around gap-2 rounded-2xl border border-border bg-muted/80 p-2 shadow-2xl backdrop-blur-2xl ring-1 ring-border/20">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -55,8 +55,8 @@ export default function MobileDashboardNav() {
               href={item.href}
               className={`flex flex-col items-center justify-center gap-1 flex-1 rounded-xl px-2 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${
                 isActive
-                  ? 'bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-lg shadow-[#fb923c]/20'
-                  : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
+                  ? 'bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground shadow-lg shadow-secondary/20'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
               }`}
             >
               <div className={`transition-transform duration-300 ${isActive ? 'scale-110' : 'scale-100'}`}>

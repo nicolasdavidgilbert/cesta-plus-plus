@@ -243,25 +243,25 @@ export default function SignInPage() {
         {/* Status Messages */}
         <div className="space-y-3">
           {sessionExpired && (
-            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-300 font-medium">
+            <div className="rounded-2xl border border-secondary/20 bg-secondary/10 px-4 py-3 text-sm text-secondary font-medium">
               Tu sesión expiró. Inicia sesión de nuevo para continuar.
             </div>
           )}
 
           {authStatus === 'success' && authType === 'verify_email' && (
-            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
+            <div className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary">
               Email verificado. Ya puedes iniciar sesión.
             </div>
           )}
 
           {authStatus === 'error' && authType === 'verify_email' && authError && (
-            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-400 font-medium">
+            <div className="rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive font-medium">
               {authError}
             </div>
           )}
 
           {error && (
-            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-400 font-medium animate-pulse">
+            <div className="rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive font-medium animate-pulse">
               {error}
             </div>
           )}
@@ -300,7 +300,7 @@ export default function SignInPage() {
           />
 
           <div className="flex items-center justify-end">
-            <Link href="#" className="text-xs font-medium text-slate-500 hover:text-brand-orange transition-colors">
+            <Link href="#" className="text-xs font-medium text-muted-foreground hover:text-secondary transition-colors">
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
@@ -308,23 +308,23 @@ export default function SignInPage() {
           <button
             type="submit"
             disabled={loading}
-            className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-brand-orange to-brand-amber px-4 py-4 text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="group relative inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 px-4 py-4 text-sm font-bold text-secondary-foreground shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+            <span className="absolute inset-0 bg-foreground/10 opacity-0 transition-opacity group-hover:opacity-100" />
             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
 
         <div className="relative flex items-center gap-4">
-          <div className="h-px flex-1 bg-white/5" />
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">O continuar con</span>
-          <div className="h-px flex-1 bg-white/5" />
+          <div className="h-px flex-1 bg-border/20" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">O continuar con</span>
+          <div className="h-px flex-1 bg-border/20" />
         </div>
 
         <button
           onClick={() => handleOAuth('google')}
           disabled={loading}
-          className="inline-flex w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm font-semibold text-white transition-all hover:bg-white/10 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex w-full items-center justify-center gap-3 rounded-2xl border border-border bg-muted/40 px-4 py-4 text-sm font-semibold text-foreground transition-all hover:bg-muted/60 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24">
             <path
@@ -347,11 +347,11 @@ export default function SignInPage() {
           Google
         </button>
 
-        <p className="text-center text-sm text-slate-500">
+        <p className="text-center text-sm text-muted-foreground">
           ¿No tienes cuenta?{' '}
           <Link
             href={redirectPath === '/dashboard' ? '/sign-up' : `/sign-up?redirect=${encodeURIComponent(redirectPath)}`}
-            className="font-bold text-brand-orange hover:text-brand-amber transition-colors"
+            className="font-bold text-secondary hover:opacity-80 transition-all"
           >
             Regístrate ahora
           </Link>

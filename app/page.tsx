@@ -84,31 +84,31 @@ export default function HomePage() {
   }
 
   return (
-    <div className="relative min-h-screen text-slate-200 selection:bg-[#fb923c]/30 selection:text-white">
+    <div className="relative min-h-screen text-foreground selection:bg-secondary/30 selection:text-secondary-foreground">
       <MeshBackground />
       
       {/* Header / Nav */}
-      <header className="fixed top-0 z-50 w-full border-b border-white/5 bg-slate-950/50 backdrop-blur-xl">
+      <header className="fixed top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-xl font-bold text-white shadow-lg shadow-[#fb923c]/20 ring-1 ring-white/20">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-secondary to-secondary/80 text-xl font-bold text-secondary-foreground shadow-lg shadow-secondary/20 ring-1 ring-border/20">
               C+
             </div>
-            <span className="text-xl font-bold tracking-tight text-white group-hover:text-[#fb923c] transition-colors">
-              Cesta<span className="text-[#fb923c]">++</span>
+            <span className="text-xl font-bold tracking-tight text-foreground group-hover:text-secondary transition-colors">
+              Cesta<span className="text-secondary">++</span>
             </span>
           </Link>
           
           <div className="flex items-center gap-4">
             <Link 
               href="/sign-in" 
-              className="text-sm font-medium text-slate-400 hover:text-white transition-colors px-4 py-2"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
             >
               Iniciar sesión
             </Link>
             <Link 
               href="/sign-up" 
-              className="hidden sm:inline-flex items-center justify-center rounded-xl bg-white/5 px-5 py-2.5 text-sm font-bold text-white ring-1 ring-white/10 transition-all hover:bg-white/10 active:scale-95"
+              className="hidden sm:inline-flex items-center justify-center rounded-xl bg-muted/40 px-5 py-2.5 text-sm font-bold text-foreground ring-1 ring-border/10 transition-all hover:bg-muted/80 active:scale-95"
             >
               Empezar gratis
             </Link>
@@ -121,14 +121,14 @@ export default function HomePage() {
         <section className="grid items-center gap-16 lg:grid-cols-2 lg:py-20">
           <div className="space-y-8">
             <div className="space-y-4">
-              <span className="inline-flex rounded-full bg-[#fb923c]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#fb923c] ring-1 ring-[#fb923c]/20">
+              <span className="inline-flex rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-secondary ring-1 ring-secondary/20">
                 La compra inteligente ha llegado
               </span>
-              <h1 className="text-5xl font-bold leading-[1.1] text-white sm:text-7xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+              <h1 className="text-5xl font-bold leading-[1.1] text-foreground sm:text-7xl bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground/90 to-foreground/60">
                 Organiza tu hogar <br />
-                <span className="text-[#fb923c]">sin stress.</span>
+                <span className="text-secondary">sin stress.</span>
               </h1>
-              <p className="max-w-xl text-lg leading-relaxed text-slate-400">
+              <p className="max-w-xl text-lg leading-relaxed text-muted-foreground">
                 Cesta++ centraliza tus listas, sincroniza a tu familia en tiempo real y guarda histórico de precios para ayudarte a ahorrar cada semana.
               </p>
             </div>
@@ -136,23 +136,24 @@ export default function HomePage() {
             <div className="flex flex-col gap-4 sm:flex-row">
               <Link 
                 href="/sign-up" 
-                className="group relative inline-flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-8 py-4 text-base font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95"
+                className="group relative inline-flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 px-8 py-4 text-base font-bold text-secondary-foreground shadow-xl shadow-secondary/20 transition-all hover:scale-[1.02] active:scale-95"
               >
-                <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+                <span className="absolute inset-0 bg-foreground/10 opacity-0 transition-opacity group-hover:opacity-100" />
                 Empieza gratis ahora
               </Link>
               <Link 
                 href="/sign-in" 
-                className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-8 py-4 text-base font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10 active:scale-95"
+                className="inline-flex items-center justify-center rounded-2xl border border-border bg-muted/40 px-8 py-4 text-base font-bold text-foreground backdrop-blur-sm transition-all hover:bg-muted/60 active:scale-95"
               >
                 Ver demostración
               </Link>
             </div>
 
-            <div className="flex items-center gap-4 text-sm text-slate-500">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex -space-x-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-8 w-8 rounded-full border-2 border-slate-950 bg-slate-800 ring-2 ring-white/5 overflow-hidden">
+                  <div key={i} className="h-8 w-8 rounded-full border-2 border-background bg-muted ring-2 ring-border/10 overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" />
                   </div>
                 ))}
@@ -163,14 +164,14 @@ export default function HomePage() {
 
           {/* Interactive Hero Preview */}
           <div className="relative">
-            <div className="absolute inset-0 animate-pulse rounded-full bg-[#fb923c]/10 blur-[120px]" />
-            <div className="relative rounded-[2.5rem] border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-2xl [background:linear-gradient(135deg,rgba(255,255,255,0.1),rgba(255,255,255,0.05))]">
-              <div className="mb-6 flex items-center justify-between border-b border-white/5 pb-4">
+            <div className="absolute inset-0 animate-pulse rounded-full bg-secondary/10 blur-[120px]" />
+            <div className="relative rounded-[2.5rem] border border-border bg-muted/20 p-6 shadow-2xl backdrop-blur-2xl [background:linear-gradient(135deg,rgba(var(--foreground-rgb),0.05),rgba(var(--foreground-rgb),0.02))]">
+              <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
                 <div>
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-white">Lista Semanal</h3>
-                  <p className="text-xs text-slate-500">Sincronizado hace un momento</p>
+                  <h3 className="text-sm font-bold uppercase tracking-widest text-foreground">Lista Semanal</h3>
+                  <p className="text-xs text-muted-foreground">Sincronizado hace un momento</p>
                 </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#fb923c]/20 text-[#fb923c]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/20 text-secondary">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
@@ -179,20 +180,20 @@ export default function HomePage() {
 
               <ul className="space-y-3">
                 {previewList.map((item) => (
-                  <li key={item.name} className="group flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3.5 transition-all hover:bg-white/10">
+                  <li key={item.name} className="group flex items-center justify-between rounded-2xl border border-border bg-muted/20 px-4 py-3.5 transition-all hover:bg-muted/40">
                     <div className="flex items-center gap-3">
                       <div className={`flex h-6 w-6 items-center justify-center rounded-lg border text-xs font-bold transition-all ${
                         item.done 
-                        ? 'border-[#fb923c] bg-[#fb923c] text-white' 
-                        : 'border-white/20 bg-white/5 text-transparent'
+                        ? 'border-secondary bg-secondary text-secondary-foreground' 
+                        : 'border-border bg-muted/20 text-transparent'
                       }`}>
                         ✓
                       </div>
-                      <span className={`text-sm font-medium transition-all ${item.done ? 'text-slate-500 line-through decoration-[#fb923c]/50' : 'text-white'}`}>
+                      <span className={`text-sm font-medium transition-all ${item.done ? 'text-muted-foreground line-through decoration-secondary/50' : 'text-foreground'}`}>
                         {item.name}
                       </span>
                     </div>
-                    <span className="text-[11px] font-bold text-[#fb923c] bg-[#fb923c]/10 px-2.5 py-1 rounded-full">{item.qty}</span>
+                    <span className="text-[11px] font-bold text-secondary bg-secondary/10 px-2.5 py-1 rounded-full">{item.qty}</span>
                   </li>
                 ))}
               </ul>
@@ -203,44 +204,44 @@ export default function HomePage() {
         {/* Benefits Section */}
         <section className="py-24 space-y-16">
           <div className="text-center space-y-4">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground/90 to-foreground/60">
               Mucho más que una lista.
             </h2>
-            <p className="mx-auto max-w-2xl text-slate-400">
+            <p className="mx-auto max-w-2xl text-muted-foreground">
               Diseñado para simplificar tu rutina diaria y ayudarte a tomar mejores decisiones financieras sin esfuerzo.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             {benefits.map((benefit) => (
-              <article key={benefit.title} className="group relative rounded-[2rem] border border-white/5 bg-white/5 p-8 backdrop-blur-sm transition-all hover:bg-white/10 hover:-translate-y-1">
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fb923c]/10 text-[#fb923c] ring-1 ring-[#fb923c]/20 group-hover:scale-110 transition-transform">
+              <article key={benefit.title} className="group relative rounded-[2rem] border border-border bg-muted/20 p-8 backdrop-blur-sm transition-all hover:bg-muted/40 hover:-translate-y-1">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10 text-secondary ring-1 ring-secondary/20 group-hover:scale-110 transition-transform">
                   {benefit.icon}
                 </div>
-                <h3 className="mb-3 text-xl font-bold text-white">{benefit.title}</h3>
-                <p className="text-sm leading-relaxed text-slate-400">{benefit.description}</p>
+                <h3 className="mb-3 text-xl font-bold text-foreground">{benefit.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{benefit.description}</p>
               </article>
             ))}
           </div>
         </section>
 
         {/* Workflow Section */}
-        <section className="relative overflow-hidden rounded-[3rem] border border-white/10 bg-slate-900/50 p-8 sm:p-12 lg:p-16">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#fb923c]/5 to-transparent opacity-50" />
+        <section className="relative overflow-hidden rounded-[3rem] border border-border bg-muted/10 p-8 sm:p-12 lg:p-16">
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 to-transparent opacity-50" />
           <div className="relative grid gap-12 lg:grid-cols-2 lg:items-center">
             <div className="space-y-6">
-              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#fb923c]">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-secondary">
                 Cómo funciona
               </span>
-              <h2 className="text-4xl font-bold leading-tight text-white">
+              <h2 className="text-4xl font-bold leading-tight text-foreground">
                 Menos caos en la compra, <br/>
                 más control en tu bolsillo.
               </h2>
-              <p className="max-w-lg text-slate-400">
+              <p className="max-w-lg text-muted-foreground">
                 Pasa de la improvisación al control total en solo cuatro pasos. Cesta++ aprende de tus hábitos para simplificar cada visita al supermercado.
               </p>
               <div className="pt-4">
-                <Link href="/sign-up" className="text-[#fb923c] font-bold hover:underline">
+                <Link href="/sign-up" className="text-secondary font-bold hover:underline">
                   Empieza ahora mismo →
                 </Link>
               </div>
@@ -248,11 +249,11 @@ export default function HomePage() {
 
             <div className="space-y-3">
               {workflowSteps.map((step, index) => (
-                <div key={step} className="flex items-center gap-4 rounded-2xl border border-white/5 bg-white/5 p-5 backdrop-blur-md">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fb923c]/20 text-sm font-bold text-[#fb923c]">
+                <div key={step} className="flex items-center gap-4 rounded-2xl border border-border bg-muted/20 p-5 backdrop-blur-md">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary/20 text-sm font-bold text-secondary">
                     {index + 1}
                   </span>
-                  <p className="text-sm font-medium text-white">{step}</p>
+                  <p className="text-sm font-medium text-foreground">{step}</p>
                 </div>
               ))}
             </div>
@@ -261,15 +262,15 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-12">
+      <footer className="border-t border-border py-12">
         <div className="container mx-auto px-6 flex flex-col items-center justify-between gap-6 sm:flex-row">
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             © 2026 Cesta++. Todos los derechos reservados.
           </p>
-          <div className="flex gap-8 text-xs font-medium text-slate-500">
-            <Link href="#" className="hover:text-white transition-colors">Privacidad</Link>
-            <Link href="#" className="hover:text-white transition-colors">Términos</Link>
-            <Link href="#" className="hover:text-white transition-colors">Contacto</Link>
+          <div className="flex gap-8 text-xs font-medium text-muted-foreground">
+            <Link href="#" className="hover:text-foreground transition-colors">Privacidad</Link>
+            <Link href="#" className="hover:text-foreground transition-colors">Términos</Link>
+            <Link href="#" className="hover:text-foreground transition-colors">Contacto</Link>
           </div>
         </div>
       </footer>

@@ -19,9 +19,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className="h-full antialiased dark">
+    <html lang="es" className="h-full antialiased">
       <body
-        className={`${geistSans.className} min-h-screen w-full bg-slate-950 text-slate-200 selection:bg-[#fb923c]/30 selection:text-white relative overflow-x-hidden`}
+        className={`${geistSans.className} relative min-h-screen w-full overflow-x-hidden bg-background text-foreground selection:bg-secondary/30 selection:text-secondary-foreground`}
       >
         <MeshBackground />
         <UserProvider>

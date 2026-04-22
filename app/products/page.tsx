@@ -96,7 +96,7 @@ function reconcileProducts(previous: Product[], incoming: Product[]) {
 }
 
 const inputClassName =
-  'w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5'
+  'w-full rounded-2xl border border-border bg-muted/40 px-6 py-4 text-sm text-foreground placeholder-muted-foreground outline-none transition-all focus:border-secondary/40 focus:bg-muted/60 focus:ring-4 focus:ring-secondary/5'
 
 export default function ProductsPage() {
   const router = useRouter()
@@ -429,8 +429,8 @@ export default function ProductsPage() {
     return (
       <main className="flex min-h-screen items-center justify-center p-6">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-[#fb923c]" />
-          <p className="text-sm font-bold uppercase tracking-widest text-[#fb923c]">Sincronizando productos</p>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-border border-t-secondary" />
+          <p className="text-sm font-bold uppercase tracking-widest text-secondary">Sincronizando productos</p>
         </div>
       </main>
     )
@@ -445,7 +445,7 @@ export default function ProductsPage() {
               <div className="space-y-4">
                 <Link
                   href="/dashboard"
-                  className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 transition-all hover:bg-white/10 hover:text-white"
+                  className="group inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-all hover:bg-muted/60 hover:text-foreground"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3 transition-transform group-hover:-translate-x-1">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -453,10 +453,10 @@ export default function ProductsPage() {
                   Volver a Listas
                 </Link>
                 <div className="space-y-1">
-                  <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+                  <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground/90 to-foreground/60">
                     Catálogo Maestro
                   </h1>
-                  <p className="text-sm text-slate-500 font-medium tracking-tight">Gestiona productos, descripciones y haz seguimiento histórico de precios.</p>
+                  <p className="text-sm text-muted-foreground font-medium tracking-tight">Gestiona productos, descripciones y haz seguimiento histórico de precios.</p>
                 </div>
               </div>
             </div>
@@ -464,7 +464,7 @@ export default function ProductsPage() {
             <div className="flex items-center gap-4">
               <div className="group relative flex-1">
                 <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-500 group-focus-within:text-[#fb923c] transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-muted-foreground group-focus-within:text-secondary transition-colors">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
                 </div>
@@ -473,13 +473,13 @@ export default function ProductsPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Busca por nombre o descripción..."
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 py-4 pl-14 pr-6 text-sm text-white placeholder-slate-500 outline-none backdrop-blur-md transition-all focus:border-[#fb923c]/50 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/10"
+                  className="w-full rounded-2xl border border-border bg-muted/20 py-4 pl-14 pr-6 text-sm text-foreground placeholder-muted-foreground outline-none backdrop-blur-md transition-all focus:border-secondary/50 focus:bg-muted/40 focus:ring-4 focus:ring-secondary/10"
                 />
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreateModal(true)}
-                className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-105 active:scale-95"
+                className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground shadow-xl shadow-secondary/20 transition-all hover:scale-105 active:scale-95"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -489,7 +489,7 @@ export default function ProductsPage() {
           </header>
 
           {error && (
-            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-6 py-4 text-sm font-medium text-rose-400 backdrop-blur-md">
+            <div className="rounded-2xl border border-destructive/20 bg-destructive/10 px-6 py-4 text-sm font-medium text-destructive backdrop-blur-md">
               {error}
             </div>
           )}
@@ -497,21 +497,21 @@ export default function ProductsPage() {
           {loading && products.length === 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-40 animate-pulse rounded-3xl border border-white/5 bg-white/5" />
+                <div key={i} className="h-40 animate-pulse rounded-3xl border border-border bg-muted/40" />
               ))}
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center space-y-6">
-              <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-white/5 text-slate-600 ring-1 ring-white/10">
+              <div className="h-24 w-24 flex items-center justify-center rounded-[2rem] bg-muted/40 text-muted-foreground ring-1 ring-border/20">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-12 h-12">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125l2.25 2.25m0 0l2.25-2.25M12 13.875V7.5M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
                 </svg>
               </div>
               <div className="space-y-2">
-                <h2 className="text-xl font-bold text-white tracking-tight">
+                <h2 className="text-xl font-bold text-foreground tracking-tight">
                   {products.length === 0 ? 'Catálogo sin ítems' : 'Sin resultados'}
                 </h2>
-                <p className="text-slate-500 text-sm max-w-xs mx-auto">
+                <p className="text-muted-foreground text-sm max-w-xs mx-auto">
                   {products.length === 0
                     ? 'Tus productos creados aparecerán aquí para ser reutilizados en cualquier lista.'
                     : 'Prueba con otros términos de búsqueda.'}
@@ -521,7 +521,7 @@ export default function ProductsPage() {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(true)}
-                  className="inline-flex items-center justify-center rounded-xl bg-white/5 px-6 py-3 text-sm font-bold text-white ring-1 ring-white/10 transition-all hover:bg-white/10 active:scale-95"
+                  className="inline-flex items-center justify-center rounded-xl bg-muted/40 px-6 py-3 text-sm font-bold text-foreground ring-1 ring-border/20 transition-all hover:bg-muted/60 active:scale-95"
                 >
                   Crear mi primer producto
                 </button>
@@ -534,16 +534,16 @@ export default function ProductsPage() {
                   type="button"
                   key={product.id}
                   onClick={() => void openProductEditor(product)}
-                  className="group relative flex flex-col items-start rounded-[2rem] border border-white/5 bg-white/5 p-6 text-left backdrop-blur-sm transition-all hover:bg-white/10 hover:border-[#fb923c]/30 hover:-translate-y-1"
+                  className="group relative flex flex-col items-start rounded-[2rem] border border-border bg-muted/20 p-6 text-left backdrop-blur-sm transition-all hover:bg-muted/40 hover:border-secondary/30 hover:-translate-y-1"
                 >
                   <div className="w-full flex items-start justify-between gap-4">
                     <div className="space-y-1">
-                      <h3 className="text-lg font-bold text-white leading-tight tracking-tight group-hover:text-[#fb923c] transition-colors">{product.title}</h3>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                      <h3 className="text-lg font-bold text-foreground leading-tight tracking-tight group-hover:text-secondary transition-colors">{product.title}</h3>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                         Actualizado: {new Date(product.updated_at).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-white/5 text-[#fb923c] ring-1 ring-white/10 transition-all group-hover:bg-[#fb923c] group-hover:text-white">
+                    <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-muted/40 text-secondary ring-1 ring-border/20 transition-all group-hover:bg-secondary group-hover:text-secondary-foreground">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                       </svg>
@@ -551,16 +551,16 @@ export default function ProductsPage() {
                   </div>
 
                   {product.description && (
-                    <p className="mt-4 line-clamp-2 text-xs font-medium text-slate-400 leading-relaxed">
+                    <p className="mt-4 line-clamp-2 text-xs font-medium text-muted-foreground leading-relaxed">
                       {product.description}
                     </p>
                   )}
 
-                  <div className="mt-8 pt-6 border-t border-white/5 w-full flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Último Precio</span>
-                    <span className="text-xl font-black text-white">
+                  <div className="mt-8 pt-6 border-t border-border w-full flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Último Precio</span>
+                    <span className="text-xl font-black text-foreground">
                       {product.current_price !== null ? `${product.current_price.toFixed(2)}` : '-'}
-                      <span className="text-[10px] ml-1 text-[#fb923c]">EUR</span>
+                      <span className="text-[10px] ml-1 text-secondary">EUR</span>
                     </span>
                   </div>
                 </button>
@@ -573,7 +573,7 @@ export default function ProductsPage() {
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="fixed bottom-28 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-xl shadow-[#fb923c]/40 transition-all hover:scale-110 active:scale-90 sm:hidden"
+            className="fixed bottom-28 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground shadow-xl shadow-secondary/40 transition-all hover:scale-110 active:scale-90 sm:hidden"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -582,17 +582,17 @@ export default function ProductsPage() {
         )}
 
         {showCreateModal && (
-          <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/80 backdrop-blur-sm p-4 sm:items-center sm:p-6">
-            <div className="w-full max-w-xl animate-in slide-in-from-bottom duration-300 rounded-[2.5rem] border border-white/20 bg-slate-900 p-8 shadow-2xl [background:linear-gradient(135deg,rgba(15,23,42,1),rgba(30,41,59,1))]">
+          <div className="fixed inset-0 z-[60] flex items-end justify-center bg-background/80 backdrop-blur-sm p-4 sm:items-center sm:p-6">
+            <div className="w-full max-w-xl animate-in slide-in-from-bottom duration-300 rounded-[2.5rem] border border-border bg-muted p-8 shadow-2xl">
               <div className="mb-8 flex items-center justify-between">
                 <div className="space-y-1">
-                  <h2 className="text-2xl font-bold text-white tracking-tight">Nuevo Producto</h2>
-                  <p className="text-xs font-medium uppercase tracking-widest text-slate-500">Añade tu producto al catálogo</p>
+                  <h2 className="text-2xl font-bold text-foreground tracking-tight">Nuevo Producto</h2>
+                  <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Añade tu producto al catálogo</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => !creating && setShowCreateModal(false)}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-slate-400 transition-colors hover:text-white"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/40 text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -602,7 +602,7 @@ export default function ProductsPage() {
 
               <form onSubmit={createProduct} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="ml-1 text-xs font-bold uppercase tracking-widest text-[#fb923c]">Nombre del producto</label>
+                  <label className="ml-1 text-xs font-bold uppercase tracking-widest text-secondary">Nombre del producto</label>
                   <input
                     type="text"
                     value={newProduct.title}
@@ -615,7 +615,7 @@ export default function ProductsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="ml-1 text-xs font-bold uppercase tracking-widest text-[#fb923c]">Descripción</label>
+                  <label className="ml-1 text-xs font-bold uppercase tracking-widest text-secondary">Descripción</label>
                   <input
                     type="text"
                     value={newProduct.description}
@@ -626,7 +626,7 @@ export default function ProductsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="ml-1 text-xs font-bold uppercase tracking-widest text-[#fb923c]">Precio inicial (EUR)</label>
+                  <label className="ml-1 text-xs font-bold uppercase tracking-widest text-secondary">Precio inicial (EUR)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -641,9 +641,9 @@ export default function ProductsPage() {
                 <button
                   type="submit"
                   disabled={creating || !newProduct.title.trim()}
-                  className="group relative mt-2 flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-6 py-4 text-base font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100"
+                  className="group relative mt-2 flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 px-6 py-4 text-base font-bold text-secondary-foreground shadow-xl shadow-secondary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100"
                 >
-                  <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+                  <span className="absolute inset-0 bg-foreground/10 opacity-0 transition-opacity group-hover:opacity-100" />
                   {creating ? 'Creando producto...' : 'Crear producto'}
                 </button>
               </form>
@@ -652,16 +652,16 @@ export default function ProductsPage() {
         )}
 
         {showEditor && selectedProduct && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-0 sm:p-6 lg:p-12">
-            <div className="w-full max-w-5xl h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-[2.5rem] border border-white/10 bg-slate-900 shadow-2xl overflow-hidden">
-              <div className="p-6 sm:p-8 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/90 backdrop-blur-md p-0 sm:p-6 lg:p-12">
+            <div className="w-full max-w-5xl h-full sm:h-auto sm:max-h-[90vh] flex flex-col rounded-none sm:rounded-[2.5rem] border border-border bg-muted shadow-2xl overflow-hidden">
+              <div className="p-6 sm:p-8 border-b border-border flex items-center justify-between bg-foreground/[0.02]">
                 <div className="space-y-1">
-                  <h3 className="text-2xl font-bold text-white tracking-tight">Detalle del Producto</h3>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#fb923c]">ID: {selectedProduct.id.slice(0, 8)}</p>
+                  <h3 className="text-2xl font-bold text-foreground tracking-tight">Detalle del Producto</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-secondary">ID: {selectedProduct.id.slice(0, 8)}</p>
                 </div>
                 <button
                   onClick={closeEditor}
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-slate-400 hover:text-white transition-colors"
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/40 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -671,10 +671,10 @@ export default function ProductsPage() {
 
               <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-8 sm:space-y-10">
                 <section className="space-y-6">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Atributos Básicos</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Atributos Básicos</span>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-500 ml-1">Nombre</label>
+                      <label className="text-xs font-bold text-muted-foreground ml-1">Nombre</label>
                       <input
                         type="text"
                         value={editorForm.title}
@@ -684,7 +684,7 @@ export default function ProductsPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-slate-500 ml-1">Descripción</label>
+                      <label className="text-xs font-bold text-muted-foreground ml-1">Descripción</label>
                       <input
                         type="text"
                         value={editorForm.description}
@@ -697,27 +697,27 @@ export default function ProductsPage() {
                   <button
                     onClick={() => void saveProductChanges()}
                     disabled={savingProduct || !editorForm.title.trim()}
-                    className="flex items-center justify-center rounded-2xl bg-white px-8 py-3 text-sm font-bold text-slate-900 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                    className="flex items-center justify-center rounded-2xl bg-foreground px-8 py-3 text-sm font-bold text-background transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                   >
                     {savingProduct ? 'Guardando...' : 'Actualizar Información'}
                   </button>
                 </section>
 
-                <section className="space-y-6 pt-10 border-t border-white/5">
+                <section className="space-y-6 pt-10 border-t border-border">
                   <div className="flex items-end justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Historial de Precios</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Historial de Precios</span>
                     <div className="text-right">
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Valor de Mercado Actual</p>
-                      <p className="text-3xl font-black text-emerald-400">
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Valor de Mercado Actual</p>
+                      <p className="text-3xl font-black text-primary">
                         {selectedProduct.current_price !== null ? `${selectedProduct.current_price.toFixed(2)}` : '-'}
                         <span className="text-xs ml-1">EUR</span>
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-4 sm:flex-row bg-white/5 p-5 sm:p-6 rounded-3xl ring-1 ring-white/10">
+                  <div className="flex flex-col gap-4 sm:flex-row bg-muted/20 p-5 sm:p-6 rounded-3xl ring-1 ring-border/20">
                     <div className="flex-1 space-y-2">
-                      <label className="text-xs font-bold text-slate-500 ml-1">Nuevo Punto de Precio</label>
+                      <label className="text-xs font-bold text-muted-foreground ml-1">Nuevo Punto de Precio</label>
                       <input
                         type="number"
                         step="0.01"
@@ -731,7 +731,7 @@ export default function ProductsPage() {
                     <button
                       onClick={() => void addNewHistoryPrice()}
                       disabled={!newHistoryPrice || addingHistory}
-                      className="group relative flex items-center justify-center overflow-hidden rounded-2xl bg-[#fb923c] px-8 py-4 text-sm font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 self-end"
+                      className="group relative flex items-center justify-center overflow-hidden rounded-2xl bg-secondary px-8 py-4 text-sm font-bold text-secondary-foreground shadow-xl shadow-secondary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 self-end"
                     >
                       {addingHistory ? 'Registrando...' : 'Registrar Precio'}
                     </button>
@@ -739,17 +739,17 @@ export default function ProductsPage() {
 
                   <div className="space-y-3">
                     {priceHistory.length === 0 ? (
-                      <p className="py-12 text-center text-xs text-slate-600 font-medium italic bg-white/5 rounded-[2rem]">Sin registros históricos aún.</p>
+                      <p className="py-12 text-center text-xs text-muted-foreground font-medium italic bg-muted/20 rounded-[2rem]">Sin registros históricos aún.</p>
                     ) : (
                       <div className="grid gap-3">
                         {priceHistory.map((entry) => (
                           <div
                             key={entry.id}
-                            className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between rounded-2xl bg-white/5 p-4 ring-1 ring-white/5 hover:bg-white/[0.08] transition-all"
+                            className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between rounded-2xl bg-muted/40 p-4 ring-1 ring-border/20 hover:bg-muted/60 transition-all"
                           >
                             <div className="space-y-1 min-w-[140px]">
-                              <p className="text-[10px] font-bold text-slate-500 uppercase">Fecha de Registro</p>
-                              <p className="text-xs font-bold text-white">
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase">Fecha de Registro</p>
+                              <p className="text-xs font-bold text-foreground">
                                 {new Date(entry.created_at).toLocaleDateString()} · {new Date(entry.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </p>
                             </div>
@@ -760,13 +760,13 @@ export default function ProductsPage() {
                                 step="0.01"
                                 value={editingHistory[entry.id] ?? ''}
                                 onChange={(e) => setEditingHistory({ ...editingHistory, [entry.id]: e.target.value })}
-                                className="h-10 grow rounded-xl border border-white/10 bg-white/5 px-4 text-sm text-white outline-none focus:border-[#fb923c]/40"
+                                className="h-10 grow rounded-xl border border-border bg-muted/20 px-4 text-sm text-foreground outline-none focus:border-secondary/40"
                               />
                               <div className="flex gap-1.5">
                                 <button
                                   onClick={() => void saveHistoryEntry(entry.id)}
                                   disabled={savingHistoryId === entry.id}
-                                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-emerald-400 hover:bg-emerald-400/20 transition-all"
+                                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/40 text-primary hover:bg-primary/20 transition-all"
                                   title="Guardar cambios"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
@@ -776,7 +776,7 @@ export default function ProductsPage() {
                                 <button
                                   onClick={() => void deleteHistoryEntry(entry.id)}
                                   disabled={deletingHistoryId === entry.id}
-                                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-rose-500 hover:bg-rose-500/20 transition-all"
+                                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/40 text-destructive hover:bg-destructive/20 transition-all"
                                   title="Eliminar entrada"
                                 >
                                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">

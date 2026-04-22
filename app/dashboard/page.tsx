@@ -94,31 +94,31 @@ const DashboardListCard = memo(function DashboardListCard({ list }: { list: Dash
   return (
     <Link
       href={`/dashboard/${list.id}`}
-      className="group relative overflow-hidden rounded-[2rem] border border-white/5 bg-white/5 p-6 backdrop-blur-sm transition-all hover:bg-white/10 hover:-translate-y-1 active:scale-[0.98]"
+      className="group relative overflow-hidden rounded-[2rem] border border-border bg-muted/20 p-6 backdrop-blur-sm transition-all hover:bg-muted/40 hover:-translate-y-1 active:scale-[0.98]"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#fb923c]/70">Lista de compra</p>
-          <h3 className="text-xl font-bold text-white group-hover:text-[#fb923c] transition-colors">{list.name}</h3>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary/70">Lista de compra</p>
+          <h3 className="text-xl font-bold text-foreground group-hover:text-secondary transition-colors">{list.name}</h3>
         </div>
         {list.access === 'owner' ? (
-          <span className="rounded-full bg-[#fb923c]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#fb923c] ring-1 ring-[#fb923c]/20">
+          <span className="rounded-full bg-secondary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary ring-1 ring-secondary/20">
             Propia
           </span>
         ) : (
-          <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400 ring-1 ring-emerald-500/20">
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary ring-1 ring-primary/20">
             Compartida
           </span>
         )}
       </div>
       
       <div className="mt-6 flex items-center justify-between">
-        <p className="text-sm text-slate-500 group-hover:text-slate-400 transition-colors">
+        <p className="text-sm text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">
           {list.access === 'owner'
             ? 'Gestiona y compra en tiempo real'
             : `Editor (${list.role || 'colaborador'})`}
         </p>
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-white/30 group-hover:bg-[#fb923c]/20 group-hover:text-[#fb923c] transition-all">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/40 text-foreground/30 group-hover:bg-secondary/20 group-hover:text-secondary transition-all">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
           </svg>
@@ -311,10 +311,10 @@ export default function DashboardPage() {
 
   if (authLoading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center p-6">
+      <main className="flex min-h-screen items-center justify-center p-6 bg-background">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/10 border-t-[#fb923c]" />
-          <p className="text-sm font-bold uppercase tracking-widest text-[#fb923c]">Sincronizando listas</p>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-muted border-t-secondary" />
+          <p className="text-sm font-bold uppercase tracking-widest text-secondary">Sincronizando listas</p>
         </div>
       </main>
     )
@@ -326,8 +326,8 @@ export default function DashboardPage() {
         <div className="mx-auto w-full max-w-4xl space-y-10">
           <header className="space-y-6">
             <div className="space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#fb923c]">Tu Centro de Control</span>
-              <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-white via-white/90 to-white/60">
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-secondary">Tu Centro de Control</span>
+              <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground/90 to-foreground/60">
                 Mis Listas
               </h1>
             </div>
@@ -335,7 +335,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-4">
               <div className="group relative flex-1">
                 <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-slate-500 group-focus-within:text-[#fb923c] transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 text-muted-foreground group-focus-within:text-secondary transition-colors">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
                 </div>
@@ -344,13 +344,13 @@ export default function DashboardPage() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Busca por nombre de lista..."
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 py-4 pl-14 pr-6 text-sm text-white placeholder-slate-500 outline-none backdrop-blur-md transition-all focus:border-[#fb923c]/50 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/10"
+                  className="w-full rounded-2xl border border-border bg-muted/20 py-4 pl-14 pr-6 text-sm text-foreground placeholder-muted-foreground outline-none backdrop-blur-md transition-all focus:border-secondary/50 focus:bg-muted/40 focus:ring-4 focus:ring-secondary/10"
                 />
               </div>
               <button
                 type="button"
                 onClick={() => setShowCreateModal(true)}
-                className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-105 active:scale-95"
+                className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground shadow-xl shadow-secondary/20 transition-all hover:scale-105 active:scale-95"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -360,7 +360,7 @@ export default function DashboardPage() {
           </header>
 
           {error && (
-            <div className="rounded-2xl border border-rose-500/20 bg-rose-500/10 px-6 py-4 text-sm font-medium text-rose-400 backdrop-blur-md">
+            <div className="rounded-2xl border border-destructive/20 bg-destructive/10 px-6 py-4 text-sm font-medium text-destructive backdrop-blur-md">
               <div className="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
@@ -375,22 +375,22 @@ export default function DashboardPage() {
               {[0, 1, 2, 3].map((skeleton) => (
                 <div
                   key={skeleton}
-                  className="h-40 animate-pulse rounded-[2rem] border border-white/5 bg-white/5"
+                  className="h-40 animate-pulse rounded-[2rem] border border-border bg-muted/20"
                 />
               ))}
             </section>
           ) : filteredLists.length === 0 ? (
             <section className="flex flex-col items-center justify-center py-20 text-center space-y-6">
-              <div className="h-20 w-20 flex items-center justify-center rounded-3xl bg-white/5 text-slate-600 ring-1 ring-white/10">
+              <div className="h-20 w-20 flex items-center justify-center rounded-3xl bg-muted/20 text-muted-foreground ring-1 ring-border/20">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="space-y-2">
-                <h2 className="text-xl font-bold text-white">
+                <h2 className="text-xl font-bold text-foreground">
                   {lists.length === 0 ? 'Todavía no tienes listas' : 'Sin resultados'}
                 </h2>
-                <p className="text-slate-500 text-sm max-w-xs mx-auto">
+                <p className="text-muted-foreground text-sm max-w-xs mx-auto">
                   {lists.length === 0
                     ? 'Comienza creando tu primera lista de la compra ahora mismo.'
                     : 'Prueba con otros términos de búsqueda.'}
@@ -399,7 +399,7 @@ export default function DashboardPage() {
               {lists.length === 0 && (
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="inline-flex items-center justify-center rounded-xl bg-white/5 px-6 py-3 text-sm font-bold text-white ring-1 ring-white/10 transition-all hover:bg-white/10 active:scale-95"
+                  className="inline-flex items-center justify-center rounded-xl bg-muted/20 px-6 py-3 text-sm font-bold text-foreground ring-1 ring-border/20 transition-all hover:bg-muted/40 active:scale-95"
                 >
                   Crear mi primera lista
                 </button>
@@ -420,7 +420,7 @@ export default function DashboardPage() {
         <button
           type="button"
           onClick={() => setShowCreateModal(true)}
-          className="fixed bottom-28 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] text-white shadow-xl shadow-[#fb923c]/40 transition-all hover:scale-110 active:scale-90 sm:hidden"
+          className="fixed bottom-28 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground shadow-xl shadow-secondary/40 transition-all hover:scale-110 active:scale-90 sm:hidden"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -430,19 +430,19 @@ export default function DashboardPage() {
 
       {/* Modern Create Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-950/80 backdrop-blur-sm p-4 sm:items-center sm:p-6">
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-background/80 backdrop-blur-sm p-4 sm:items-center sm:p-6">
           <div 
-            className="w-full max-w-md animate-in slide-in-from-bottom duration-300 rounded-[2.5rem] border border-white/20 bg-slate-900 p-8 shadow-2xl [background:linear-gradient(135deg,rgba(15,23,42,1),rgba(30,41,59,1))]"
+            className="w-full max-w-md animate-in slide-in-from-bottom duration-300 rounded-[2.5rem] border border-border bg-muted p-8 shadow-2xl [background:linear-gradient(135deg,var(--background),var(--muted))]"
           >
             <div className="mb-8 flex items-center justify-between">
               <div className="space-y-1">
-                <h2 className="text-2xl font-bold text-white tracking-tight">Nueva Lista</h2>
-                <p className="text-xs text-slate-500 font-medium uppercase tracking-widest text-slate-500">Comienza tu compra</p>
+                <h2 className="text-2xl font-bold text-foreground tracking-tight">Nueva Lista</h2>
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">Comienza tu compra</p>
               </div>
               <button
                 type="button"
                 onClick={() => !creating && setShowCreateModal(false)}
-                className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 text-slate-400 hover:text-white transition-colors"
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/40 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -452,13 +452,13 @@ export default function DashboardPage() {
 
             <form onSubmit={createList} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-[#fb923c] ml-1">Nombre de la lista</label>
+                <label className="text-xs font-bold uppercase tracking-widest text-secondary ml-1">Nombre de la lista</label>
                 <input
                   type="text"
                   value={newListName}
                   onChange={(e) => setNewListName(e.target.value)}
                   placeholder="Ej: Súper semanal, Cena familia..."
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white placeholder-slate-600 outline-none transition-all focus:border-[#fb923c]/40 focus:bg-white/10 focus:ring-4 focus:ring-[#fb923c]/5"
+                  className="w-full rounded-2xl border border-border bg-muted/40 px-6 py-4 text-sm text-foreground placeholder-muted-foreground/60 outline-none transition-all focus:border-secondary/40 focus:bg-muted/60 focus:ring-4 focus:ring-secondary/5"
                   autoFocus
                 />
               </div>
@@ -466,9 +466,9 @@ export default function DashboardPage() {
               <button
                 type="submit"
                 disabled={creating || !newListName.trim()}
-                className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f59e0b] px-6 py-4 text-base font-bold text-white shadow-xl shadow-[#fb923c]/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100"
+                className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 px-6 py-4 text-base font-bold text-secondary-foreground shadow-xl shadow-secondary/20 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:grayscale disabled:hover:scale-100"
               >
-                <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
+                <span className="absolute inset-0 bg-foreground/10 opacity-0 transition-opacity group-hover:opacity-100" />
                 {creating ? 'Creando lista...' : 'Crear lista inteligente'}
               </button>
             </form>
