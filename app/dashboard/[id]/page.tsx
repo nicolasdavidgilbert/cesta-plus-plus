@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useUser } from '@/contexts/UserContext'
 import { insforge } from '@/lib/insforge'
+import { ListRealtime, type ListChangedRealtimePayload } from './ListRealtime'
 
 type ShoppingList = {
   id: string
@@ -54,17 +55,6 @@ type ShareByEmailResult = {
   shared_user_id: string
   shared_email: string
   already_shared: boolean
-}
-
-type RealtimePayload = {
-  meta?: {
-    channel?: string
-    senderId?: string
-  }
-}
-
-type ListChangedRealtimePayload = RealtimePayload & {
-  user_id?: string
 }
 
 type DashboardTab = 'products' | 'settings' | 'stats'
@@ -245,6 +235,100 @@ export default function ListDetailPage() {
     [listId, user?.id]
   )
 
+  const applyRealtimeListChange = useCallback(
+    (payload: ListChangedRealtimePayload) => {
+      switch (payload.action) {
+        case 'item_added':
+        case 'product_created': {
+          if (!payload.item) {
+            void loadData()
+            return
+          }
+
+          const incomingItem = {
+            ...payload.item,
+            product: payload.product ?? payload.item.product,
+          }
+
+          setItems((current) => {
+            const existingById = current.some((item) => item.id === incomingItem.id)
+            if (existingById) {
+              return current.map((item) => (item.id === incomingItem.id ? incomingItem : item))
+            }
+
+            const existingByProduct = current.some((item) => item.product_id === incomingItem.product_id)
+            if (existingByProduct) {
+              return current.map((item) =>
+                item.product_id === incomingItem.product_id
+                  ? { ...item, quantity: incomingItem.quantity, checked: incomingItem.checked }
+                  : item
+              )
+            }
+
+            return [incomingItem, ...current]
+          })
+
+          if (payload.product) {
+            setProducts((current) => {
+              const exists = current.some((product) => product.id === payload.product!.id)
+              return exists
+                ? current.map((product) => (product.id === payload.product!.id ? payload.product! : product))
+                : [payload.product!, ...current]
+            })
+          }
+          return
+        }
+
+        case 'item_checked': {
+          if (!payload.item_id || typeof payload.checked !== 'boolean') {
+            void loadData()
+            return
+          }
+
+          setItems((current) =>
+            current.map((item) => (item.id === payload.item_id ? { ...item, checked: payload.checked! } : item))
+          )
+          return
+        }
+
+        case 'item_quantity': {
+          if (!payload.item_id || typeof payload.quantity !== 'number') {
+            void loadData()
+            return
+          }
+
+          setItems((current) =>
+            current.map((item) => (item.id === payload.item_id ? { ...item, quantity: payload.quantity! } : item))
+          )
+          return
+        }
+
+        case 'item_removed': {
+          if (!payload.item_id) {
+            void loadData()
+            return
+          }
+
+          setItems((current) => current.filter((item) => item.id !== payload.item_id))
+          return
+        }
+
+        default:
+          void loadData()
+      }
+    },
+    [loadData]
+  )
+
+  const handleMembersRealtimeChange = useCallback(() => {
+    void loadMembers()
+    void loadData()
+  }, [loadData, loadMembers])
+
+  const handleInviteLinksRealtimeChange = useCallback(() => {
+    void loadInviteLinks()
+  }, [loadInviteLinks])
+
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/sign-in')
@@ -267,43 +351,6 @@ export default function ListDetailPage() {
       void loadInviteLinks()
     })
   }, [canManageMembers, loadInviteLinks, loadMembers])
-
-  useEffect(() => {
-    if (!user || !listId) return
-
-    const listUpdatesHandler = (payload: ListChangedRealtimePayload) => {
-      // Deduplicación robusta: meta.senderId del SDK o user_id de nuestro payload
-      const isOwnEvent = payload.meta?.senderId === user.id || payload.user_id === user.id
-      if (payload.meta?.channel === listChannel && !isOwnEvent) {
-        void loadData()
-      }
-    }
-
-    const membersUpdatesHandler = (payload: RealtimePayload) => {
-      if (payload.meta?.channel === listChannel) {
-        void loadMembers()
-        void loadData()
-      }
-    }
-
-    const inviteLinksUpdatesHandler = (payload: RealtimePayload) => {
-      if (payload.meta?.channel === listChannel && canManageMembers) {
-        void loadInviteLinks()
-      }
-    }
-
-    void insforge.realtime.subscribe(listChannel)
-    insforge.realtime.on('list_changed', listUpdatesHandler)
-    insforge.realtime.on('members_changed', membersUpdatesHandler)
-    insforge.realtime.on('invite_links_changed', inviteLinksUpdatesHandler)
-
-    return () => {
-      insforge.realtime.off('list_changed', listUpdatesHandler)
-      insforge.realtime.off('members_changed', membersUpdatesHandler)
-      insforge.realtime.off('invite_links_changed', inviteLinksUpdatesHandler)
-      insforge.realtime.unsubscribe(listChannel)
-    }
-  }, [canManageMembers, listChannel, listId, loadData, loadInviteLinks, loadMembers, user])
 
   function buildInviteUrl(token: string) {
     if (typeof window === 'undefined') return `/invite/${token}`
@@ -553,7 +600,9 @@ export default function ListDetailPage() {
       return
     }
 
-    if (!existingItem && response.data) {
+    const syncedItem = response.data ? ({ ...(response.data as ListItem), product: selectedProduct } as ListItem) : null
+
+    if (!existingItem && syncedItem) {
       const createdItem = response.data as ListItem
       setItems((current) =>
         current.map((item) =>
@@ -568,7 +617,22 @@ export default function ListDetailPage() {
     }
 
     try {
-      await publishListEvent('list_changed', { action: 'item_added', product_id: productId })
+      await publishListEvent(
+        'list_changed',
+        existingItem
+          ? {
+              action: 'item_quantity',
+              item_id: syncedItem?.id ?? existingItem.id,
+              product_id: productId,
+              quantity: syncedItem?.quantity ?? existingItem.quantity + 1,
+            }
+          : {
+              action: 'item_added',
+              item: syncedItem,
+              product: selectedProduct,
+              product_id: productId,
+            }
+      )
     } catch {
       setError('Se agregó el producto, pero no se pudo notificar en tiempo real.')
     }
@@ -652,7 +716,11 @@ export default function ListDetailPage() {
       current.map((product) => (product.id === optimisticProductId ? nextProduct : product))
     )
 
-    if (!itemRes.error && itemRes.data) {
+    const syncedProductItem = !itemRes.error && itemRes.data
+      ? ({ ...(itemRes.data as ListItem), product: nextProduct } as ListItem)
+      : null
+
+    if (syncedProductItem) {
       const nextItem = itemRes.data as ListItem
       setItems((current) =>
         current.map((item) =>
@@ -668,7 +736,12 @@ export default function ListDetailPage() {
       await loadData()
     }
 
-    await publishListEvent('list_changed', { action: 'product_created', product_id: created.created_id })
+    await publishListEvent('list_changed', {
+      action: 'product_created',
+      item: syncedProductItem,
+      product: nextProduct,
+      product_id: created.created_id,
+    })
     await publishUserListsEvent(user!.id, 'updated')
     const memberIds = members.map((member) => member.user_id)
     await Promise.all(memberIds.map((memberId) => publishUserListsEvent(memberId, 'updated')))
@@ -701,7 +774,12 @@ export default function ListDetailPage() {
     }
 
     try {
-      await publishListEvent('list_changed', { action: 'item_checked', item_id: item.id })
+      await publishListEvent('list_changed', {
+        action: 'item_checked',
+        checked: nextValue,
+        item_id: item.id,
+        product_id: item.product_id,
+      })
     } catch {
       setError('Se guardó el cambio, pero no se pudo notificar en tiempo real.')
     } finally {
@@ -759,7 +837,21 @@ export default function ListDetailPage() {
     }
 
     try {
-      await publishListEvent('list_changed', { action: 'item_quantity', item_id: item.id })
+      await publishListEvent(
+        'list_changed',
+        newQuantity < 1
+          ? {
+              action: 'item_removed',
+              item_id: item.id,
+              product_id: item.product_id,
+            }
+          : {
+              action: 'item_quantity',
+              item_id: item.id,
+              product_id: item.product_id,
+              quantity: newQuantity,
+            }
+      )
     } catch {
       setError('Se guardó el cambio, pero no se pudo notificar en tiempo real.')
     } finally {
@@ -803,7 +895,11 @@ export default function ListDetailPage() {
     }
 
     try {
-      await publishListEvent('list_changed', { action: 'item_removed', item_id: itemId })
+      await publishListEvent('list_changed', {
+        action: 'item_removed',
+        item_id: itemId,
+        product_id: previousItem?.product_id,
+      })
     } catch {
       setError('Se guardó el cambio, pero no se pudo notificar en tiempo real.')
     } finally {
@@ -853,6 +949,14 @@ export default function ListDetailPage() {
 
   return (
     <main className="min-h-screen w-full px-4 sm:px-6 py-12 pb-40">
+      <ListRealtime
+        canManageMembers={canManageMembers}
+        listId={listId}
+        onInviteLinksChanged={handleInviteLinksRealtimeChange}
+        onListChanged={applyRealtimeListChange}
+        onMembersChanged={handleMembersRealtimeChange}
+        userId={user.id}
+      />
       <div className="mx-auto w-full max-w-4xl space-y-10">
         <header className="space-y-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
