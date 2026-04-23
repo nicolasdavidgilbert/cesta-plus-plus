@@ -33,16 +33,14 @@ const PRODUCTS_CACHE_TTL_MS = 5 * 60 * 1000
 const PRODUCTS_CACHE_PREFIX = 'products_cache_v1:'
 const PRODUCTS_MIN_REFETCH_GAP_MS = 8 * 1000
 
-function getSubFromAccessToken(token: string): string | null {
-  try {
-    const base64Url = token.split('.')[1]
-    if (!base64Url) return null
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-    const json = JSON.parse(atob(base64))
-    return typeof json?.sub === 'string' && json.sub.trim() ? json.sub : null
-  } catch {
-    return null
-  }
+function isAuthErrorMessage(message: string | null | undefined) {
+  const normalized = (message ?? '').toLowerCase()
+  return (
+    normalized.includes('invalid token') ||
+    normalized.includes('unauthorized') ||
+    normalized.includes('token expired') ||
+    normalized.includes('session invalid')
+  )
 }
 
 function getProductsCacheKey(userId: string) {
@@ -217,16 +215,37 @@ export default function ProductsPage() {
     e.preventDefault()
     if (!newProduct.title.trim() || !user) return
 
+    const title = newProduct.title.trim()
+    const description = newProduct.description.trim() || null
+    const price = newProduct.price ? parseFloat(newProduct.price) : null
+    const optimisticId = `optimistic-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+    const now = new Date().toISOString()
+    const optimisticProduct: Product = {
+      id: optimisticId,
+      title,
+      description,
+      current_price: price,
+      created_at: now,
+      updated_at: now,
+    }
+
     setCreating(true)
     setError('')
-    const price = newProduct.price ? parseFloat(newProduct.price) : null
+    setProducts((previous) => {
+      const nextProducts = [optimisticProduct, ...previous]
+      writeCachedProducts(user.id, nextProducts)
+      return nextProducts
+    })
+    setNewProduct({ title: '', description: '', price: '' })
+    setShowCreateModal(false)
+    setCreating(false)
 
     const { data, error: insertError } = await insforge.database
       .from('products')
       .insert([
         {
-          title: newProduct.title.trim(),
-          description: newProduct.description.trim() || null,
+          title,
+          description,
           current_price: price,
         },
       ])
@@ -234,8 +253,12 @@ export default function ProductsPage() {
       .single()
 
     if (insertError || !data) {
+      setProducts((previous) => {
+        const nextProducts = previous.filter((product) => product.id !== optimisticId)
+        writeCachedProducts(user.id, nextProducts)
+        return nextProducts
+      })
       setError(insertError?.message ?? 'No se pudo crear el producto.')
-      setCreating(false)
       return
     }
 
@@ -249,13 +272,10 @@ export default function ProductsPage() {
     }
 
     setProducts((previous) => {
-      const nextProducts = [data, ...previous]
+      const nextProducts = previous.map((product) => (product.id === optimisticId ? data : product))
       writeCachedProducts(user.id, nextProducts)
       return nextProducts
     })
-    setNewProduct({ title: '', description: '', price: '' })
-    setShowCreateModal(false)
-    setCreating(false)
   }
 
   async function openProductEditor(product: Product) {
@@ -309,49 +329,59 @@ export default function ProductsPage() {
     setAddingHistory(true)
     setError('')
 
-    const { data: refreshedSession, error: refreshError } = await insforge.auth.refreshSession()
-    if (!refreshError && refreshedSession?.accessToken) {
-      insforge.getHttpClient().setAuthToken(refreshedSession.accessToken)
-    }
+    const insertHistory = () =>
+      insforge.database.from('price_history').insert([
+        {
+          product_id: selectedProduct.id,
+          price: parsedPrice,
+          created_by: user.id,
+        },
+      ])
 
-    const refreshedSub = refreshedSession?.accessToken
-      ? getSubFromAccessToken(refreshedSession.accessToken)
-      : null
-    const { data: currentUserData, error: currentUserError } = await insforge.auth.getCurrentUser()
-    const sessionUserId = refreshedSub ?? (currentUserError ? null : currentUserData?.user?.id)
-    if (!sessionUserId) {
-      setError('Tu sesión expiró. Inicia sesión de nuevo para actualizar precios.')
-      setAddingHistory(false)
+    let { error: historyError } = await insertHistory()
+    if (historyError && isAuthErrorMessage(historyError.message)) {
       await refreshUser()
-      router.push('/sign-in?redirect=/products')
-      return
+      ;({ error: historyError } = await insertHistory())
     }
-
-    const { error: historyError } = await insforge.database.from('price_history').insert([
-      {
-        product_id: selectedProduct.id,
-        price: parsedPrice,
-        created_by: sessionUserId,
-      },
-    ])
 
     if (historyError) {
+      if (isAuthErrorMessage(historyError.message)) {
+        setError('Tu sesión expiró. Inicia sesión de nuevo para actualizar precios.')
+        setAddingHistory(false)
+        router.push('/sign-in?redirect=/products')
+        return
+      }
+
       setError(historyError.message)
       setAddingHistory(false)
       return
     }
 
-    const { data: productData, error: productError } = await insforge.database
-      .from('products')
-      .update({
-        current_price: parsedPrice,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', selectedProduct.id)
-      .select()
-      .single()
+    const updateProductPrice = () =>
+      insforge.database
+        .from('products')
+        .update({
+          current_price: parsedPrice,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', selectedProduct.id)
+        .select()
+        .single()
+
+    let { data: productData, error: productError } = await updateProductPrice()
+    if (productError && isAuthErrorMessage(productError.message)) {
+      await refreshUser()
+      ;({ data: productData, error: productError } = await updateProductPrice())
+    }
 
     if (productError) {
+      if (isAuthErrorMessage(productError.message)) {
+        setError('Tu sesión expiró. Inicia sesión de nuevo para actualizar precios.')
+        setAddingHistory(false)
+        router.push('/sign-in?redirect=/products')
+        return
+      }
+
       setError(productError.message)
       setAddingHistory(false)
       return

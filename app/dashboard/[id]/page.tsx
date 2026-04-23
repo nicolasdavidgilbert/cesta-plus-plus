@@ -481,63 +481,198 @@ export default function ListDetailPage() {
   async function addExistingProduct(productId: string) {
     setError('')
     const existingItem = items.find((item) => item.product_id === productId)
-    const { error } = existingItem
+    const optimisticItemId = `optimistic-item-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+    const selectedProduct =
+      products.find((product) => product.id === productId) ??
+      existingItem?.product ?? {
+        id: productId,
+        title: 'Producto',
+        current_price: null,
+      }
+
+    if (existingItem) {
+      setItems((current) =>
+        current.map((item) =>
+          item.id === existingItem.id
+            ? {
+                ...item,
+                quantity: item.quantity + 1,
+              }
+            : item
+        )
+      )
+    } else {
+      const optimisticItem: ListItem = {
+        id: optimisticItemId,
+        list_id: listId,
+        product_id: productId,
+        quantity: 1,
+        checked: false,
+        product: selectedProduct,
+      }
+      setItems((current) => [optimisticItem, ...current])
+    }
+
+    setShowAddProduct(false)
+
+    const response = existingItem
       ? await insforge.database
           .from('shopping_list_items')
           .update({ quantity: existingItem.quantity + 1 })
           .eq('id', existingItem.id)
-      : await insforge.database.from('shopping_list_items').insert([
-          {
-            list_id: listId,
-            product_id: productId,
-            quantity: 1,
-          },
-        ])
+          .select('*')
+          .single()
+      : await insforge.database
+          .from('shopping_list_items')
+          .insert([
+            {
+              list_id: listId,
+              product_id: productId,
+              quantity: 1,
+            },
+          ])
+          .select('*')
+          .single()
 
-    if (error) {
-      setError(error.message)
+    if (response.error) {
+      if (existingItem) {
+        setItems((current) =>
+          current.map((item) =>
+            item.id === existingItem.id
+              ? {
+                  ...item,
+                  quantity: existingItem.quantity,
+                }
+              : item
+          )
+        )
+      } else {
+        setItems((current) => current.filter((item) => item.id !== optimisticItemId))
+      }
+      setError(response.error.message)
       return
     }
 
-    await publishListEvent('list_changed', { action: 'item_added', product_id: productId })
-    await loadData()
-    setShowAddProduct(false)
+    if (!existingItem && response.data) {
+      const createdItem = response.data as ListItem
+      setItems((current) =>
+        current.map((item) =>
+          item.id === optimisticItemId
+            ? {
+                ...createdItem,
+                product: selectedProduct,
+              }
+            : item
+        )
+      )
+    }
+
+    try {
+      await publishListEvent('list_changed', { action: 'item_added', product_id: productId })
+    } catch {
+      setError('Se agregó el producto, pero no se pudo notificar en tiempo real.')
+    }
   }
 
   async function createAndAddProduct(e: React.FormEvent) {
     e.preventDefault()
     if (!newProduct.title.trim()) return
 
-    setCreatingProduct(true)
-    setError('')
+    const title = newProduct.title.trim()
+    const description = newProduct.description.trim() || null
     const parsedPrice = newProduct.price.trim() ? Number(newProduct.price.replace(',', '.')) : null
     const price = parsedPrice !== null && Number.isFinite(parsedPrice) ? parsedPrice : null
+    const optimisticProductId = `optimistic-product-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+    const optimisticItemId = `optimistic-item-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+    const optimisticProduct: Product = {
+      id: optimisticProductId,
+      title,
+      current_price: price,
+    }
+    const optimisticItem: ListItem = {
+      id: optimisticItemId,
+      list_id: listId,
+      product_id: optimisticProductId,
+      quantity: 1,
+      checked: false,
+      product: optimisticProduct,
+    }
+
+    setCreatingProduct(true)
+    setError('')
+    setItems((current) => [optimisticItem, ...current])
+    setProducts((current) => [optimisticProduct, ...current])
+    setNewProduct({ title: '', description: '', price: '' })
+    setShowAddProduct(false)
 
     const { data, error } = await insforge.database.rpc('create_product_for_list', {
       target_list_id: listId,
-      product_title: newProduct.title.trim(),
-      product_description: newProduct.description.trim() || null,
+      product_title: title,
+      product_description: description,
       product_price: price,
     })
 
     if (error) {
+      setItems((current) => current.filter((item) => item.id !== optimisticItemId))
+      setProducts((current) => current.filter((product) => product.id !== optimisticProductId))
       setError(error.message)
       setCreatingProduct(false)
       return
     }
 
     const created = (Array.isArray(data) ? data[0] : data) as CreatedListProduct | undefined
-    if (created) {
-      await publishListEvent('list_changed', { action: 'product_created', product_id: created.created_id })
-      await publishUserListsEvent(user!.id, 'updated')
-      const memberIds = members.map((member) => member.user_id)
-      await Promise.all(memberIds.map((memberId) => publishUserListsEvent(memberId, 'updated')))
-
-      await loadData()
-      setNewProduct({ title: '', description: '', price: '' })
+    if (!created) {
+      setItems((current) => current.filter((item) => item.id !== optimisticItemId))
+      setProducts((current) => current.filter((product) => product.id !== optimisticProductId))
+      setError('No se pudo crear el producto.')
+      setCreatingProduct(false)
+      return
     }
+
+    const [productRes, itemRes] = await Promise.all([
+      insforge.database.from('products').select('id, title, current_price').eq('id', created.created_id).single(),
+      insforge.database
+        .from('shopping_list_items')
+        .select('*')
+        .eq('list_id', listId)
+        .eq('product_id', created.created_id)
+        .single(),
+    ])
+
+    const nextProduct: Product =
+      !productRes.error && productRes.data
+        ? (productRes.data as Product)
+        : {
+            id: created.created_id,
+            title: created.title,
+            current_price: created.current_price,
+          }
+
+    setProducts((current) =>
+      current.map((product) => (product.id === optimisticProductId ? nextProduct : product))
+    )
+
+    if (!itemRes.error && itemRes.data) {
+      const nextItem = itemRes.data as ListItem
+      setItems((current) =>
+        current.map((item) =>
+          item.id === optimisticItemId
+            ? {
+                ...nextItem,
+                product: nextProduct,
+              }
+            : item
+        )
+      )
+    } else {
+      await loadData()
+    }
+
+    await publishListEvent('list_changed', { action: 'product_created', product_id: created.created_id })
+    await publishUserListsEvent(user!.id, 'updated')
+    const memberIds = members.map((member) => member.user_id)
+    await Promise.all(memberIds.map((memberId) => publishUserListsEvent(memberId, 'updated')))
     setCreatingProduct(false)
-    setShowAddProduct(false)
   }
 
   async function toggleChecked(item: ListItem) {

@@ -246,12 +246,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
 
     if (error) {
-      if (isAuthSessionError(error)) {
-        await handleRefreshFailure()
-        setLoading(false)
-        return
-      }
-
       const refreshed = await refreshSession()
       if (!refreshed.ok) {
         if (refreshed.reason === 'transient') {
@@ -275,7 +269,40 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
 
     setLoading(false)
-  }, [handleRefreshFailure, hydrateTokensFromCookies, refreshSession])
+  }, [hydrateTokensFromCookies, refreshSession])
+
+  useEffect(() => {
+    const httpClient = insforge.getHttpClient() as {
+      setAuthToken: (token: string | null) => void
+      setRefreshToken: (token: string | null) => void
+    }
+
+    const originalSetAuthToken = httpClient.setAuthToken.bind(httpClient)
+    const originalSetRefreshToken = httpClient.setRefreshToken.bind(httpClient)
+
+    httpClient.setAuthToken = (token: string | null) => {
+      originalSetAuthToken(token)
+      if (token) {
+        writeCookie(ACCESS_TOKEN_COOKIE, token, ACCESS_TOKEN_MAX_AGE_SECONDS)
+      } else {
+        deleteCookie(ACCESS_TOKEN_COOKIE)
+      }
+    }
+
+    httpClient.setRefreshToken = (token: string | null) => {
+      originalSetRefreshToken(token)
+      if (token) {
+        writeCookie(REFRESH_TOKEN_COOKIE, token, REFRESH_TOKEN_MAX_AGE_SECONDS)
+      } else {
+        deleteCookie(REFRESH_TOKEN_COOKIE)
+      }
+    }
+
+    return () => {
+      httpClient.setAuthToken = originalSetAuthToken
+      httpClient.setRefreshToken = originalSetRefreshToken
+    }
+  }, [])
 
   useEffect(() => {
     queueMicrotask(() => {
