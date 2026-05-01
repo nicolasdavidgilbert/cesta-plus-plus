@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Capacitor } from '@capacitor/core'
+import { Capacitor, registerPlugin } from '@capacitor/core'
 import { App as CapacitorApp } from '@capacitor/app'
 import { Browser } from '@capacitor/browser'
 import { useUser } from '@/contexts/UserContext'
@@ -19,6 +19,11 @@ type SignInQueryState = {
   redirectPath: string
 }
 
+type NativeBrowserPlugin = {
+  open: (options: { url: string }) => Promise<void>
+}
+
+const NativeBrowser = registerPlugin<NativeBrowserPlugin>('NativeBrowser')
 const CAPACITOR_APP_SCHEME = 'site.insforge.cestapp'
 const OAUTH_REDIRECT_PATH_KEY = 'oauth_redirect_path'
 const OAUTH_CODE_VERIFIER_KEY = 'oauth_code_verifier'
@@ -33,6 +38,22 @@ function isNativeCapacitorApp() {
     return Capacitor.isNativePlatform()
   } catch {
     return false
+  }
+}
+
+async function openOAuthUrlInNativeBrowser(url: string) {
+  try {
+    await Browser.open({ url })
+    return
+  } catch (browserError) {
+    console.warn('Capacitor Browser.open failed, trying Android ACTION_VIEW fallback.', browserError)
+  }
+
+  try {
+    await NativeBrowser.open({ url })
+  } catch (nativeBrowserError) {
+    console.error('Native browser fallback failed.', nativeBrowserError)
+    throw nativeBrowserError
   }
 }
 
@@ -222,9 +243,9 @@ export default function SignInPage() {
 
       if (data?.url) {
         try {
-          await Browser.open({ url: data.url })
+          await openOAuthUrlInNativeBrowser(data.url)
         } catch {
-          setError('No se pudo abrir Google OAuth en el navegador del sistema.')
+          setError('No se pudo abrir Google OAuth. Revisa que el dispositivo tenga un navegador instalado y activo.')
           setLoading(false)
         }
       } else {
